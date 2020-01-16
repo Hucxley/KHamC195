@@ -5,10 +5,45 @@
  */
 package DAO;
 
+import static DAO.DBConnection.DB;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 /**
  *
  * @author Kenneth Ham
  */
 public class QueryManager {
+    
+    private static String query;
+    private static String queryType;
+    private static Statement statement;
+    private static ResultSet results;
+    
+    public static void makeRequest(String type, String q) {
+        
+        try {
+            queryType = type;
+            query = q;
+            statement = DB.createStatement();
+            if(queryType.equals("select")){
+                results = statement.executeQuery(queryType + query);
+            } else {
+                statement.executeUpdate(queryType + query);
+            }
+ 
+        } catch (SQLException eSQL){
+            System.out.println("sql error: "+ eSQL);
+        } catch (Exception e) {
+            System.out.println("general error: "+ e);
+        }
+        
+    }
+    
+    public static ResultSet getResults(){
+        return results;
+    }
+    
     
 }

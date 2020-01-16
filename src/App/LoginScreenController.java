@@ -6,7 +6,11 @@
 package App;
 
 import DAO.DBConnection;
+import DAO.QueryManager;
+import DAO.UserDataAccess;
+import DataModels.User;
 import java.net.URL;
+import java.sql.ResultSet;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -39,11 +43,9 @@ public class LoginScreenController implements Initializable {
     
     Stage stage;
     
-    private final String username = "test";
-    private final String password = "test";
-    private static String activeUser;
+    private static User activeUser;
     
-    private static void setActiveUser(String user){
+    private static void setActiveUser(User user){
         LoginScreenController.activeUser = user;
     }
     
@@ -51,7 +53,7 @@ public class LoginScreenController implements Initializable {
         LoginScreenController.activeUser = null;
     }
     
-    public static String getActiveUser(){
+    public static User getActiveUser(){
         return LoginScreenController.activeUser;
     }
 
@@ -59,19 +61,29 @@ public class LoginScreenController implements Initializable {
     @FXML
     private void handleButtonAction(ActionEvent event) throws Exception{
 
-        if(txtUsername.getText().equals(this.username) && txtPassword.getText().equals(this.password)){
-            setActiveUser(txtUsername.getText().trim());
+        String inputUser = txtUsername.getText().trim();
+        String inputPass = txtPassword.getText().trim();
+        boolean authenticatedUser = false;
+        DBConnection.startConnection();       
+        User currentUser;
+        
+        currentUser = UserDataAccess.getByUsername(txtUsername.getText().trim());        
+        authenticatedUser = (inputUser.equals(currentUser.getUsername()) && inputPass.equals(currentUser.getPassword()));
+        
+        System.out.println(authenticatedUser);
+        
+        if(!authenticatedUser){
+            label.setText("Login Unsuccessful.\nPlease try again.");
+        }else{
+            setActiveUser(currentUser);
             stage = KHamC195.getMainStage();
             label.setText("Login Successful!");
-            DBConnection.startConnection();
             Parent root = FXMLLoader.load(getClass().getResource("UserScreen.fxml"));
         
             Scene scene = new Scene(root);
 
             stage.setScene(scene);
             stage.show();
-        }else{
-            label.setText("Login Unsuccessful.\nPlease try again.");
         }
         
     }

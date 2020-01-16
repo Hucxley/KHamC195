@@ -31,9 +31,6 @@ public class DBConnection {
             if(DB != null){
                 // DB is accessible
                 System.out.println("db connected");
-                Statement st = DB.createStatement();
-                ResultSet rs = st.executeQuery("select * from user");
-                System.out.println(rs);
             }
             
         } catch (ClassNotFoundException ex){

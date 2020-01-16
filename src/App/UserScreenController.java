@@ -5,6 +5,7 @@
  */
 package App;
 
+import DataModels.User;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -34,7 +35,7 @@ public class UserScreenController implements Initializable {
     @FXML
     private Button btnLogoutUser;
     
-    private static String activeUser; 
+    private static User activeUser; 
     private final String viewName = "Home Screen";
     
     /**
@@ -68,7 +69,7 @@ public class UserScreenController implements Initializable {
         stage.show();
     }
     
-    public String getActiveUser() {
+    public User getActiveUser() {
         return UserScreenController.activeUser;
     }
 
@@ -77,8 +78,8 @@ public class UserScreenController implements Initializable {
     }
    
     private void setHeaderText(){
-        String currentUser = getActiveUser();
-        txtHeader.setText(currentUser + "'s " + viewName);
+        User currentUser = getActiveUser();
+        txtHeader.setText(currentUser.getUsername() + "'s " + viewName);
     }
         
 }
