@@ -41,6 +41,24 @@ public class QueryManager {
         
     }
     
+    public ResultSet getDataFromTable(String tableName){
+        
+        String q = " * from '" + tableName + "'";
+        ResultSet response = null;
+        
+        try {
+            QueryManager.makeRequest("select", q);
+            response = QueryManager.results;
+            if(response.next()){
+               return response;
+            } 
+        } catch (SQLException eSQL){
+            System.out.println("SQL Error: " + eSQL);
+        }
+        
+        return response;
+    }
+    
     public static ResultSet getResults(){
         return results;
     }

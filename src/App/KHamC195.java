@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import DataModels.Customer
 
 /**
  *
@@ -18,6 +19,7 @@ import javafx.stage.Stage;
 public class KHamC195 extends Application {
     
     private static Stage mainStage;
+    private static Customer activeCustomer;
     
     private static void setStage(Stage stage){
         KHamC195.mainStage = stage;

@@ -1,0 +1,145 @@
+.button {
+    -fx-background-color: #0091ea;
+    -fx-background-radius: 0em;
+    -fx-text-fill: #FFFFFF;
+}
+
+.table-view .column-header,
+.table-view .column-header .filler,
+.table-view .column-header-background .filler {
+    -fx-background-color:  #0091ea;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #FFFFFF;
+}
+
+/* 
+    Java Scrollbar Custom CSS Guide
+    https://blog.ngopal.com.np/2012/07/11/customize-scrollbar-via-css 
+*/
+
+.table-view .scroll-bar:horizontal,
+.table-view .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.table-view .increment-button,
+.table-view .decrement-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FFFFFF;
+}
+
+.table-view .scroll-bar:horizontal .track,
+.table-view .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.table-view .scroll-bar:horizontal .thumb,
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #0091ea;
+    -fx-background-radius: 0em;
+    -fx-background-insets: 0, 0, 0;
+}
+
+/* 
+    Java TableView Row Selection Custom Styles
+    From user James_D at https://stackoverflow.com/a/21709666
+*/
+
+.table-row-cell:selected {
+    -fx-background-color: #0091ea;
+}
+
+.table-row-cell:selected .text {
+    -fx-fill: #FFFFFF;
+}
+
+.table-row-cell {
+    -fx-background-color: #212121;
+}
+
+.table-row-cell .text {
+    -fx-fill: #FFFFFF;
+}
+
+.text-field, password-field {
+    -fx-background-color: #212121;
+    -fx-background-radius: 0em;
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-fill: #FFFFFF;
+    -fx-border-color: transparent transparent #0091ea transparent;
+}
+
+.label { 
+    -fx-text-fill: #FFFFFF;
+}
+
+/* JavaFX Checkbox CSS Styles
+   From user fabian at https://stackoverflow.com/a/52130540
+*/
+   
+
+.check-box {
+    /* default properties */
+    selected-box-color: #212121;
+    border-color: #0091ea;
+    border-radius: 1em;
+    box-color: #212121;
+    mark-color: #0091ea;
+    -fx-text-fill: #FFFFFF;
+}
+
+.check-box:selected > .box {
+    /* background color for selected checkbox */
+    -fx-background-color: selected-box-color;
+    -fx-border-color: border-color;
+    -fx-border-radius: .10em;
+   
+}
+
+.check-box > .box {
+    /* background color of unselected checkbox */
+    -fx-background-color: box-color;
+    -fx-border-color: border-color;
+    -fx-border-radius: .10em;
+}
+
+.check-box:selected > .box > .mark,
+.check-box:indeterminate  > .box > .mark {
+    /* modify mark color */
+    -fx-background-color: mark-color;
+}
+
+/* JavaFX ChoiceBox CSS Customization
+     From user DVarga https://stackoverflow.com/a/43537040
+
+*/
+/* Background color of the control itself */
+.choice-box {
+  -fx-background-color: #212121;
+  -fx-mark-color: #0091ea; /* arrow color */
+}
+
+/* Selected item text color on the control itself */
+.choice-box > .label { 
+    -fx-text-fill: #FFFFFF; 
+}
+/* Background color of the whole context menu */
+.choice-box .context-menu { 
+    -fx-background-color: #212121; 
+}
+/* Focused item background color in the list */
+.choice-box .menu-item:focused { 
+    -fx-background-color: #0091ea; 
+}
+/* Text color of non-focused items in the list */
+.choice-box .menu-item > .label { 
+    -fx-text-fill: #FFFFFF; 
+}
+/* Text color of focused item in the list */
+.choice-box .menu-item:focused > .label { 
+    -fx-text-fill: #FFFFFF; 
+}
+
+

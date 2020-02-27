@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="900.0" minHeight="600.0" minWidth="900.0" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #212121;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.UserScreenController">
+   <children>
+      <Label fx:id="txtHeader" prefHeight="54.0" prefWidth="900.0" style="-fx-background-color: #0091ea;" text="Main Menu" textFill="WHITE">
+         <font>
+            <Font name="Roboto" size="24.0" />
+         </font>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </Label>
+      <GridPane layoutY="54.0" maxHeight="600.0" maxWidth="900.0" minHeight="549.0" minWidth="900.0" prefHeight="549.0" prefWidth="900.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" />
+          <ColumnConstraints hgrow="SOMETIMES" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" valignment="CENTER" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" valignment="CENTER" vgrow="NEVER" />
+          <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" valignment="CENTER" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" valignment="CENTER" vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Button fx:id="btnViewAppointments" alignment="CENTER" contentDisplay="CENTER" maxHeight="26.0" maxWidth="180.0" minHeight="26.0" minWidth="180.0" mnemonicParsing="false" onAction="#handleViewAppointmentsButton" prefHeight="26.0" prefWidth="180.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Manage Appoiontments" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+               <font>
+                  <Font name="Roboto Light" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnViewCustomers" alignment="CENTER" contentDisplay="CENTER" maxHeight="26.0" maxWidth="180.0" minHeight="26.0" minWidth="180.0" mnemonicParsing="false" onAction="#handleViewCustomersButton" prefHeight="26.0" prefWidth="180.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Manage Customers" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+               <font>
+                  <Font name="Roboto Light" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnViewUsers" alignment="CENTER" contentDisplay="CENTER" maxHeight="26.0" maxWidth="180.0" minHeight="26.0" minWidth="180.0" mnemonicParsing="false" onAction="#handleViewUsersButton" prefHeight="26.0" prefWidth="180.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Manage Users" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+               <font>
+                  <Font name="Roboto Light" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnLogoutUser" alignment="CENTER" contentDisplay="CENTER" maxHeight="26.0" maxWidth="180.0" minHeight="26.0" minWidth="180.0" mnemonicParsing="false" onAction="#handleLogoutUserButton" prefHeight="26.0" prefWidth="180.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Logout" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+               <font>
+                  <Font name="Roboto Light" size="13.0" />
+               </font>
+            </Button>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

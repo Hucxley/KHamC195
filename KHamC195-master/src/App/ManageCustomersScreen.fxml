@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #212121;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.ManageCustomersScreenController">
+   <children>
+      <Label fx:id="txtHeader" prefHeight="54.0" prefWidth="900.0" style="-fx-background-color: #0091ea;" text="Manage Customers" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <font>
+            <Font name="Roboto" size="24.0" />
+         </font>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </Label>
+      <GridPane layoutY="54.0" prefHeight="464.0" prefWidth="900.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="5.0" />
+            <ColumnConstraints hgrow="SOMETIMES" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="5.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints percentHeight="2.5" vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="2.5" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="2.5" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <TableView fx:id="tableManageCustomers" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="464.0" prefWidth="810.0" style="-fx-background-color: #262626;" stylesheets="@css/styles.css" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+               <columns>
+                  <TableColumn fx:id="colCustomerId" prefWidth="52.0" text="Id" />
+                  <TableColumn fx:id="colCustomerName" prefWidth="163.0" text="Name" />
+                  <TableColumn fx:id="colCustomerActive" prefWidth="52.0" text="Active" />
+                  <TableColumn fx:id="colCustomerStreetAddress" editable="false" minWidth="0.0" prefWidth="155.0" text="Street Address" />
+                  <TableColumn fx:id="colCustomerCity" editable="false" minWidth="0.0" prefWidth="102.0" text="City" />
+                  <TableColumn fx:id="colCustomerCountry" prefWidth="104.0" text="Country" />
+                  <TableColumn fx:id="colCustomerPostalCode" prefWidth="76.0" text="Zip Code" />
+                  <TableColumn fx:id="colDateLastUpdated" prefWidth="105.0" text="Last Updated" />
+               </columns>
+            </TableView>
+            <GridPane GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="135.0" prefWidth="135.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="135.0" prefWidth="135.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="135.0" prefWidth="135.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="135.0" prefWidth="135.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Button fx:id="btnAddCustomer" maxHeight="26.0" maxWidth="130.0" minHeight="26.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleAddCustomerButton" prefHeight="26.0" prefWidth="130.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Add Customer" textFill="WHITE" GridPane.columnIndex="4" GridPane.halignment="RIGHT">
+                     <font>
+                        <Font name="Roboto Light" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnEditCustomer" alignment="CENTER" maxHeight="26.0" maxWidth="130.0" minHeight="26.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleEditCustomerButton" prefHeight="26.0" prefWidth="130.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Edit Customer" textFill="WHITE" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="Roboto Light" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnDeleteCustomer" maxHeight="26.0" maxWidth="130.0" minHeight="26.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleDeleteCustomerButton" prefHeight="26.0" prefWidth="130.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Delete Customer" textFill="WHITE" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="Roboto Light" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnCancelManageCustomers" maxHeight="26.0" maxWidth="130.0" minHeight="26.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleCancelManageCustomersButton" prefHeight="26.0" prefWidth="130.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Cancel" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="Roboto Light" size="13.0" />
+                     </font>
+                  </Button>
+               </children>
+            </GridPane>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

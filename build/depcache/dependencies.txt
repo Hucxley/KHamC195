@@ -37,6 +37,7 @@ java.lang.StringBuilder
 java.sql.Statement
 DAO.DBConnection
 DAO.QueryManager
+java.sql.ResultSet
 java.io.PrintStream
 java.lang.System
 java.sql.Connection
