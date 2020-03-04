@@ -5,14 +5,25 @@
  */
 package App;
 
+import DAO.AppointmentDataAccess;
 import DAO.DBConnection;
 import DAO.UserDataAccess;
+import DAO.QueryManager;
+import DataModels.Appointment;
 import DataModels.User;
+import Utilities.DateTimeManager;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -67,6 +78,7 @@ public class LoginScreenController implements Initializable {
         
         String inputUser = txtUsername.getText().trim();
         String inputPass = txtPassword.getText().trim();
+        Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         boolean authenticatedUser = false;
         User currentUser;
         
@@ -78,6 +90,15 @@ public class LoginScreenController implements Initializable {
             if(currentUser != null){
                 authenticatedUser = (inputUser.equals(currentUser.getUsername()) && inputPass.equals(currentUser.getPassword()));
                 if(authenticatedUser){
+                    ArrayList<Appointment> appointments = (ArrayList) AppointmentDataAccess.getAppointmentsByUserId(currentUser.getUserId());
+                    System.out.println(appointments.size());
+                    appointments.forEach((Appointment appointment) -> {
+                       Calendar startTime = appointment.getStart();
+                        int diffBetween = startTime.compareTo(currentTime);
+                        System.out.println("difference between appointments: " + diffBetween);
+                        
+                    });
+                    
                     logUserInfo(currentUser);
                     setActiveUser(currentUser);
                 }
@@ -106,6 +127,10 @@ public class LoginScreenController implements Initializable {
         String timestamp = Utilities.DateTimeManager.getCurrentTimeUTC();
         String userActivity = timestamp + ": user: " + user.getUsername() + " logged in.";
         Utilities.ActivityLog.logUserActivity(userActivity);
+    }
+
+    private Appointment QueryManager(String select, String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 

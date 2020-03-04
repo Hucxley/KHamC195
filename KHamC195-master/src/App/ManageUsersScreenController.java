@@ -63,11 +63,13 @@ public class ManageUsersScreenController implements Initializable {
     private Button btnEditUser;
     @FXML
     private Button btnDeleteUser;
-    @FXML
-    private Button btnCancelManageUsers;
     
     // State Manager Imports
     Stage stage = ApplicationStateController.getMainStage();
+    @FXML
+    private Button btnViewUserAppointments;
+    @FXML
+    private Button btnCancelManageUsers1;
 
 
     /**
@@ -147,6 +149,26 @@ public class ManageUsersScreenController implements Initializable {
         stage.setScene(scene);
         stage.centerOnScreen();
         stage.show();
+    }
+
+    @FXML
+    private void handleViewUserAppointmentsButton(ActionEvent event) {
+        try
+        {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("ManageAppointmentScreen.fxml"));
+            loader.load();
+
+            ManageAppointmentScreenController MASController = loader.getController();
+            MASController.setAppointmentsFilter("user", tableManageUsers.getSelectionModel().getSelectedItem().getUserId());
+
+            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+            Parent scene = loader.getRoot();
+            stage.setScene(new Scene(scene));
+            stage.show();
+        }catch(IOException ex){
+            System.out.println(ex);
+        }
     }
 
 

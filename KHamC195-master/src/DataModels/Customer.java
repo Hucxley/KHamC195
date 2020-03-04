@@ -41,7 +41,7 @@ public class Customer {
         this.active = active;
         this.createDate = createDate;
         this.createdBy = createdBy;
-        this.lastUpdate = lastUpdate;
+        this.lastUpdate = lastUpdated;
         this.lastUpdateBy = lastUpdateBy;
         this.lastUpdatedDisplay = DateTimeManager.toDateTimeString(lastUpdated);
     }

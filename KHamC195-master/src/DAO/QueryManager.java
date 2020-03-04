@@ -88,5 +88,40 @@ public class QueryManager {
         return lastId;
     }
     
+    public static int dataTableHasValueInFieldName(String tableName, String propertyName, String value){
+
+        int foundRecord = -1;
+        try{
+          String query = " * from " + tableName + " where " + propertyName + " = '" + value + "'";
+            makeRequest("select", query);
+            ResultSet result = getResults();
+            if(result.next()){
+                foundRecord = result.getInt(propertyName + "Id");
+            }
+        }catch(SQLException ex){
+            System.out.println(ex);
+        }
+        
+        return foundRecord;
+    }
+
+    public static int getExistingAddress(String address1, String postalCode) {
+
+        int foundRecord = -1;
+        try{
+          String query = " * from address where address = '"+ address1 +"' and postalCode = '" + postalCode +"'";
+          
+            makeRequest("select", query);
+            ResultSet result = getResults();
+            if(result.next()){
+                foundRecord = result.getInt("addressId");
+            }
+        }catch(SQLException ex){
+            System.out.println(ex);
+        }
+        
+        return foundRecord;
+    }
+    
     
 }

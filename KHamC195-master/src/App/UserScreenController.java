@@ -78,11 +78,36 @@ public class UserScreenController implements Initializable {
    
 
     @FXML
-    private void handleViewAppointmentsButton(ActionEvent event) {
+    private void handleViewAppointmentsButton(ActionEvent event) throws IOException {
+        try
+        {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("ManageAppointmentScreen.fxml"));
+            loader.load();
+
+            ManageAppointmentScreenController MASController = loader.getController();
+            
+            MASController.setAppointmentsFilter("all", -1);
+
+            Stage stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+            Parent scene = loader.getRoot();
+            stage.setScene(new Scene(scene));
+            stage.show();
+        }catch(Exception ex){
+            System.out.println(ex);
+        }
     }
 
 
     private void handleUserAdminButton(ActionEvent event) throws IOException {
+        Stage stage = ApplicationStateController.getMainStage();
+        Parent root = FXMLLoader.load(getClass().getResource("ManageUsersScreen.fxml"));
+        
+        Scene scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.show();
 
     }
 

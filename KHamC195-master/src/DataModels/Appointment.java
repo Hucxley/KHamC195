@@ -5,6 +5,7 @@
  */
 package DataModels;
 
+import Utilities.DateTimeManager;
 import java.util.Calendar;
 
 /**
@@ -28,6 +29,11 @@ public class Appointment {
     private String createdBy;
     private Calendar lastUpdate;
     private String lastUpdateBy;
+    private String lastUpdateDisplay;
+    private String durationDisplay;
+    private String userNameDisplay;
+    private String customerNameDisplay;
+    private String startTimeDisplay;
     
     
     
@@ -48,6 +54,7 @@ public class Appointment {
         this.createdBy = createdBy;
         this.lastUpdate = lastUpdate;
         this.lastUpdateBy = lastUpdateBy;
+        this.lastUpdateDisplay = DateTimeManager.toDateTimeString(lastUpdate);
     }
     
     
@@ -175,6 +182,46 @@ public class Appointment {
 
     public void setLastUpdateBy(String lastUpdateBy) {
         this.lastUpdateBy = lastUpdateBy;
+    }
+
+    public String getLastUpdateDisplay() {
+        return lastUpdateDisplay;
+    }
+
+    public void setLastUpdateDisplay(String lastUpdateDisplay) {
+        this.lastUpdateDisplay = lastUpdateDisplay;
+    }
+
+    public String getDurationDisplay() {
+        return durationDisplay;
+    }
+
+    public void setDurationDisplay(String durationDisplay) {
+        this.durationDisplay = durationDisplay;
+    }
+
+    public String getUserNameDisplay() {
+        return userNameDisplay;
+    }
+
+    public void setUserNameDisplay(String userNameDisplay) {
+        this.userNameDisplay = userNameDisplay;
+    }
+
+    public String getCustomerNameDisplay() {
+        return customerNameDisplay;
+    }
+
+    public void setCustomerNameDisplay(String customerNameDisplay) {
+        this.customerNameDisplay = customerNameDisplay;
+    }
+
+    public String getStartTimeDisplay() {
+        return startTimeDisplay;
+    }
+
+    public void setStartTimeDisplay(String startTimeDisplay) {
+        this.startTimeDisplay = startTimeDisplay;
     }
     
     

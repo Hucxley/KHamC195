@@ -35,7 +35,7 @@ public class DateTimeManager {
     public static String toDateTimeString(Calendar cal) {
         String strDateTime;
         ZonedDateTime zdt = ZonedDateTime.parse(cal.toInstant().toString());
-        strDateTime = zdt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        strDateTime = zdt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
         return strDateTime;
     }
     

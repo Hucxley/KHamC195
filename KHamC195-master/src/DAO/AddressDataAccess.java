@@ -34,6 +34,7 @@ public class AddressDataAccess {
                 Calendar lastUpdate = DateTimeManager.convertToCalendar(response.getString("lastUpdate"));
                 String lastUpdateBy = response.getString("lastUpdateBy");
                 foundAddress = new Address(addressId, addressLine1, addressLine2, cityId, postalCode, phone, createDate, createdBy, lastUpdate, lastUpdateBy);
+                System.out.println(phone);
                 return foundAddress;
             } else {
                 System.out.println("address not found");

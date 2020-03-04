@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +29,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -72,6 +75,8 @@ public class ManageCustomersScreenController implements Initializable {
     private Button btnCancelManageCustomers;
     
     Stage stage = ApplicationStateController.getMainStage();
+    @FXML
+    private Button btnViewCustomerAppointments;
 
 
 
@@ -120,6 +125,7 @@ public class ManageCustomersScreenController implements Initializable {
         customer.setStreetAddressDisplay(); // CONCAT Address and Address2 for display in table in single cell
         customer.setCityName(customerCity.getCityName());
         customer.setCountryName(customerCountry.getCountryName());
+        customer.setPhoneNumber(customerAddress.getPhone());
         customer.setPostalCode(customerAddress.getPostalCode());
         tableManageCustomers.getItems().add(customer);
     });
@@ -148,18 +154,74 @@ public class ManageCustomersScreenController implements Initializable {
 
     @FXML
     private void handleEditCustomerButton(ActionEvent event) throws IOException {
+        try
+        {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("EditCustomerScreen.fxml"));
+            loader.load();
+
+            EditCustomerScreenController ECSController = loader.getController();
+            ECSController.setCustomerToEdit(tableManageCustomers.getSelectionModel().getSelectedItem());
+
+            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+            Parent scene = loader.getRoot();
+            stage.setScene(new Scene(scene));
+            stage.show();
+        }catch(IOException ex){
+            System.out.println(ex);
+        }
         
-        Parent root = FXMLLoader.load(getClass().getResource("EditCustomerScreen.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.centerOnScreen();
-        stage.show();
     }
 
     @FXML
     private void handleDeleteCustomerButton(ActionEvent event) {
+
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Delete Customer Request");
+        confirmAlert.setHeaderText("Deleting Customers Cannot Be Reversed!");
+        confirmAlert.setContentText("Are you sure you want to remove this customer and all appointments?");
+        Customer selectedCustomer = tableManageCustomers.getSelectionModel().getSelectedItem();
         
-        //TODO: add modal confirmation
+        Optional<ButtonType> response = confirmAlert.showAndWait();
+        if(response.get() == ButtonType.OK){
+            setCustomerInactive(selectedCustomer);
+            //deleteCustomerAppointments(selectedCustomer);
+            
+        }else{
+            confirmAlert.hide();
+        }
+    }
+    
+    private void setCustomerInactive(Customer customer){
+        try {
+            String queryBody = ("* from customer where customerId = " + customer.getCustomerId());
+            QueryManager.makeRequest("select", queryBody);
+            ResultSet customerRecord = QueryManager.getResults();
+            while(customerRecord.next()){
+                customerRecord.updateInt("active", 0);
+                customerRecord.updateRow();
+            }
+            
+        } catch (SQLException ex){
+            System.out.println(ex);
+        }
+    }
+    
+    private void deleteCustomerAppointments(Customer customer){
+        try {
+            String queryBody = ("* from appointment where customerId = " + customer.getCustomerId());
+            QueryManager.makeRequest("select", queryBody);
+            ResultSet appointments = QueryManager.getResults();
+            while(appointments.next()){
+                appointments.updateString("customerId", null);
+                appointments.updateString("userId", null);
+                appointments.updateRow();
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex);
+        }
+
+        
     }
 
     @FXML
@@ -170,6 +232,28 @@ public class ManageCustomersScreenController implements Initializable {
         stage.setScene(scene);
         stage.centerOnScreen();
         stage.show();
+    }
+
+    @FXML
+    private void handleViewCustomerAppointmentsButton(ActionEvent event) {
+         try
+        {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("ManageAppointmentScreen.fxml"));
+            loader.load();
+
+            ManageAppointmentScreenController MASController = loader.getController();
+             int custId = tableManageCustomers.getSelectionModel().getSelectedItem().getCustomerId();
+            
+            MASController.setAppointmentsFilter("customer", custId);
+
+            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+            Parent scene = loader.getRoot();
+            stage.setScene(new Scene(scene));
+            stage.show();
+        }catch(Exception ex){
+            System.out.println(ex);
+        }
     }
 
     

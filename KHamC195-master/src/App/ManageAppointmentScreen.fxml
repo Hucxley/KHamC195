@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #212121;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.ManageAppointmentScreenController">
+   <children>
+      <Label fx:id="txtHeader" prefHeight="54.0" prefWidth="900.0" style="-fx-background-color: #0091ea;" text="Manage Appointments" textFill="WHITE">
+         <font>
+            <Font name="Roboto" size="24.0" />
+         </font>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </Label>
+      <GridPane layoutY="54.0" prefHeight="464.0" prefWidth="900.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="5.0" />
+            <ColumnConstraints hgrow="SOMETIMES" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="5.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints percentHeight="2.5" vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="2.5" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="2.5" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <TableView fx:id="tableManageAppointments" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="464.0" prefWidth="810.0" style="-fx-background-color: #262626;" stylesheets="@css/styles.css" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+               <columns>
+                  <TableColumn fx:id="colAppointmentId" editable="false" prefWidth="43.0" resizable="false" text="Id" />
+                  <TableColumn fx:id="colCustomerName" editable="false" prefWidth="143.0" resizable="false" text="Customer" />
+                  <TableColumn fx:id="colUserName" editable="false" prefWidth="100.0" resizable="false" text="User" />
+                  <TableColumn fx:id="colAppointmentLocation" editable="false" prefWidth="137.0" resizable="false" text="Location" />
+                  <TableColumn fx:id="colAppointmentStartTime" editable="false" prefWidth="159.0" resizable="false" text="Appt Start" />
+                  <TableColumn fx:id="colAppointmentDuration" editable="false" prefWidth="64.0" resizable="false" text="Minutes" />
+                  <TableColumn fx:id="colDateLastUpdated" editable="false" prefWidth="160.0" resizable="false" text="Last Updated" />
+               </columns>
+            </TableView>
+            <GridPane GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="135.0" prefWidth="135.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="135.0" prefWidth="150.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="135.0" prefWidth="135.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="135.0" prefWidth="135.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Button fx:id="btnAddAppointment" maxHeight="26.0" maxWidth="130.0" minHeight="26.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleAddAppointmentButton" prefHeight="26.0" prefWidth="130.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Add Appointment" textFill="WHITE" GridPane.columnIndex="6" GridPane.halignment="RIGHT">
+                     <font>
+                        <Font name="Roboto Light" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnEditAppointment" alignment="CENTER" maxHeight="26.0" maxWidth="130.0" minHeight="26.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleEditAppointmentButton" prefHeight="26.0" prefWidth="130.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Edit Appointment" textFill="WHITE" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="Roboto Light" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnDeleteAppointment" maxHeight="26.0" maxWidth="145.0" minHeight="26.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleDeleteAppointmentButton" prefHeight="26.0" prefWidth="145.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Delete Appointment" textFill="WHITE" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="Roboto Light" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnCancelManageAppointments" maxHeight="26.0" maxWidth="130.0" minHeight="26.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleCancelManageAppointmentsButton" prefHeight="26.0" prefWidth="130.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Cancel" textFill="WHITE" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="Roboto Light" size="13.0" />
+                     </font>
+                  </Button>
+                  <RadioButton fx:id="btnAppointmentViewAll" mnemonicParsing="false" onAction="#handleBtnAppointmentViewAll" selected="true" text="All" textFill="WHITE">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="apptViewRange" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="btnAppointmentViewWeek" mnemonicParsing="false" onAction="#handleBtnAppointmentViewWeek" text="Next 7 Days" textFill="WHITE" toggleGroup="$apptViewRange" GridPane.columnIndex="1">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </RadioButton>
+                  <RadioButton fx:id="btnAppointmentViewMonth" mnemonicParsing="false" onAction="#handleBtnAppointmentViewMonth" text="Next Month" textFill="WHITE" toggleGroup="$apptViewRange" GridPane.columnIndex="2">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </RadioButton>
+               </children>
+            </GridPane>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>
