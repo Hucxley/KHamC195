@@ -49,7 +49,7 @@
             <Label focusTraversable="false" text="Location" GridPane.columnIndex="2" GridPane.rowIndex="5" />
             <Label focusTraversable="false" text="Contact" GridPane.columnIndex="2" GridPane.rowIndex="6" />
             <Label text="URL" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-            <Label focusTraversable="false" text="Date" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+            <Label focusTraversable="false" text="Start Date" GridPane.columnIndex="2" GridPane.rowIndex="8" />
             <ComboBox fx:id="comboBoxUserName" editable="true" onAction="#handleAppointmentUserNameComboBox" prefWidth="310.0" promptText="Select User..." GridPane.columnIndex="3" GridPane.rowIndex="1" />
             <TextField fx:id="txtAppointmentTitle" promptText="Title (optional)" GridPane.columnIndex="3" GridPane.rowIndex="3" />
             <TextField fx:id="txtAppointmentDescription" promptText="Description (optional)" GridPane.columnIndex="3" GridPane.rowIndex="4" />
@@ -67,11 +67,10 @@
                </rowConstraints>
                <children>
                   <Label focusTraversable="false" text="Time" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                  <DatePicker fx:id="datePickerAppointmentDate" onAction="#handleAppointmentDatePicker" prefWidth="230.0" promptText="Select Appointment Date..." />
+                  <DatePicker fx:id="datePickerAppointmentStartDate" onAction="#handleAppointmentStartDatePicker" prefWidth="230.0" promptText="Select Start Date" />
                   <ComboBox fx:id="comboBoxStartTime" editable="true" onAction="#handleStartTimeComboBox" prefWidth="230.0" promptText="Select Start Time...." GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" />
                </children>
             </GridPane>
-            <ComboBox fx:id="comboBoxDuration" editable="true" onAction="#handleAppointmentDurationComboBox" prefWidth="230.0" promptText="Select Duration" GridPane.columnIndex="3" GridPane.rowIndex="9" />
             <GridPane GridPane.columnIndex="3" GridPane.rowIndex="10">
                <columnConstraints>
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="192.0" minWidth="10.0" prefWidth="178.0" />
@@ -91,8 +90,23 @@
                   <Button fx:id="btnCancelEditAppointment" cancelButton="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleCancelEditAppointmentButton" prefWidth="75.0" text="Cancel" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="BOTTOM" />
                </children>
             </GridPane>
-            <Label focusTraversable="false" text="Duration" GridPane.columnIndex="2" GridPane.rowIndex="9" />
+            <Label focusTraversable="false" text="End Date" GridPane.columnIndex="2" GridPane.rowIndex="9" />
             <ComboBox fx:id="comboBoxCustomerName" editable="true" onAction="#handleAppointmentCustomerNameComboBox" prefWidth="310.0" promptText="Select Customer..." GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <GridPane GridPane.columnIndex="3" GridPane.rowIndex="9">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="75.0" prefWidth="75.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label focusTraversable="false" text="Time" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                  <DatePicker fx:id="datePickerAppointmentEndDate" onAction="#handleAppointmentEndDatePicker" prefWidth="230.0" promptText="Select End Date" />
+                  <ComboBox fx:id="comboBoxEndTime" editable="true" onAction="#handleEndTimeComboBox" prefWidth="230.0" promptText="Select End Time...." GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" />
+               </children>
+            </GridPane>
          </children>
       </GridPane>
       <Label fx:id="txtHeader" prefHeight="54.0" prefWidth="900.0" style="-fx-background-color: #0091ea;" text="Edit Appointment" textFill="WHITE">

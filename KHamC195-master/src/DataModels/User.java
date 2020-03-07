@@ -7,6 +7,7 @@ package DataModels;
 
 import DAO.QueryManager;
 import Utilities.DateTimeManager;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 
 /**
@@ -19,9 +20,9 @@ public class User {
     private String username;
     private String password;
     private boolean active;
-    private Calendar createdDate;
+    private ZonedDateTime createdDate;
     private String createdBy;
-    private Calendar lastUpdated;
+    private ZonedDateTime lastUpdated;
     private String lastUpdatedBy;
     private String createdDateDisplay;
     private String lastUpdatedDisplay;
@@ -41,7 +42,7 @@ public class User {
      * @param lastUpdated
      * @param updatedBy Calendar
      */
-    public User(String user, String pass, boolean isActive, Calendar created, String createdBy, Calendar lastUpdated, String updatedBy){
+    public User(String user, String pass, boolean isActive, ZonedDateTime created, String createdBy, ZonedDateTime lastUpdated, String updatedBy){
         this.userId = QueryManager.getLastIdFromTable("user");
         this.username = user;
         this.password = pass;
@@ -65,7 +66,7 @@ public class User {
      * @param lastUpdated
      * @param updatedBy 
      */
-    public User(int id, String user, String pass, boolean isActive, Calendar created, String createdBy, Calendar lastUpdated, String updatedBy){
+    public User(int id, String user, String pass, boolean isActive, ZonedDateTime created, String createdBy, ZonedDateTime lastUpdated, String updatedBy){
         this.userId = id;
         this.username = user;
         this.password = pass;
@@ -81,7 +82,10 @@ public class User {
     
     // CLASS METHODS
 
-    
+    @Override 
+    public String toString(){
+        return username;
+    }
     
     
     // GETTERS & SETTERS
@@ -117,11 +121,11 @@ public class User {
         this.active = active;
     }
 
-    public Calendar getCreatedDate() {
+    public ZonedDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Calendar createdDate) {
+    public void setCreatedDate(ZonedDateTime createdDate) {
         this.createdDate = createdDate;
     }
     
@@ -133,11 +137,11 @@ public class User {
         this.createdBy = createdBy;
     }
 
-    public Calendar getLastUpdated() {
+    public ZonedDateTime getLastUpdated() {
         return lastUpdated;
     }
 
-    public void setLastUpdated(Calendar lastUpdated) {
+    public void setLastUpdated(ZonedDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 

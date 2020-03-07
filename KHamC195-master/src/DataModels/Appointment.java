@@ -6,6 +6,7 @@
 package DataModels;
 
 import Utilities.DateTimeManager;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 
 /**
@@ -23,11 +24,11 @@ public class Appointment {
     private String contact;
     private String type;
     private String url;
-    private Calendar start;
-    private Calendar end;
-    private Calendar createDate;
+    private ZonedDateTime start;
+    private ZonedDateTime end;
+    private ZonedDateTime createDate;
     private String createdBy;
-    private Calendar lastUpdate;
+    private ZonedDateTime lastUpdate;
     private String lastUpdateBy;
     private String lastUpdateDisplay;
     private String durationDisplay;
@@ -38,7 +39,7 @@ public class Appointment {
     
     
     // CONSTRUCTORS
-    public Appointment(int appointmentId, int customerId, int userId, String title, String description, String location, String contact, String type, String url, Calendar start, Calendar end, Calendar createDate, String createdBy, Calendar lastUpdate, String lastUpdateBy) {
+    public Appointment(int appointmentId, int customerId, int userId, String title, String description, String location, String contact, String type, String url, ZonedDateTime start, ZonedDateTime end, ZonedDateTime createDate, String createdBy, ZonedDateTime lastUpdate, String lastUpdateBy) {
         this.appointmentId = appointmentId;
         this.customerId = customerId;
         this.userId = userId;
@@ -136,27 +137,27 @@ public class Appointment {
         this.url = url;
     }
 
-    public Calendar getStart() {
+    public ZonedDateTime getStart() {
         return start;
     }
 
-    public void setStart(Calendar start) {
+    public void setStart(ZonedDateTime start) {
         this.start = start;
     }
 
-    public Calendar getEnd() {
+    public ZonedDateTime getEnd() {
         return end;
     }
 
-    public void setEnd(Calendar end) {
+    public void setEnd(ZonedDateTime end) {
         this.end = end;
     }
 
-    public Calendar getCreateDate() {
+    public ZonedDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Calendar createDate) {
+    public void setCreateDate(ZonedDateTime createDate) {
         this.createDate = createDate;
     }
 
@@ -168,11 +169,11 @@ public class Appointment {
         this.createdBy = createdBy;
     }
 
-    public Calendar getLastUpdate() {
+    public ZonedDateTime getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(Calendar lastUpdate) {
+    public void setLastUpdate(ZonedDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 

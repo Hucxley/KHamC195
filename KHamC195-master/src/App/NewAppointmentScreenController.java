@@ -5,8 +5,11 @@
  */
 package App;
 
+import DataModels.Customer;
+import DataModels.User;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -34,21 +37,24 @@ public class NewAppointmentScreenController implements Initializable {
     @FXML
     private TextField txtAppointmentURL;
     @FXML
-    private DatePicker datePickerAppointmentDate;
-    @FXML
     private ComboBox<String> comboBoxStartTime;
+    @FXML
+    private DatePicker datePickerAppointmentStartDate;
+    @FXML
+    private DatePicker datePickerAppointmentEndDate;
+    @FXML
+    private ComboBox<String> comboBoxEndTime;
     @FXML
     private Button btnAppointmentAdd;
     @FXML
-    private ComboBox<Integer> comboBoxDuration;
-    @FXML
-    private ComboBox<String> comboBoxUserName;
+    private ComboBox<User> comboBoxUserName;
     @FXML
     private Label txtHeader;
     @FXML
-    private ComboBox<?> comboBoxCustomerName;
+    private ComboBox<Customer> comboBoxCustomerName;
     @FXML
     private Button btnCancelNewAppointment;
+
 
     /**
      * Initializes the controller class.
@@ -56,11 +62,25 @@ public class NewAppointmentScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
-
-    @FXML
-    private void handleAppointmentDatePicker(ActionEvent event) {
+        populateComboBoxes();
+    }   
+    
+    
+    // INSTANCE METHODS 
+        private void populateComboBoxes() {
+        ObservableList<User> usersList = DAO.UserDataAccess.getUsersList();
+        ObservableList<Customer> customersList = DAO.CustomerDataAccess.getCustomers();
+        
+ 
+        comboBoxStartTime.getItems().addAll(ApplicationStateController.getAllowedAppointmentTimes());
+        comboBoxEndTime.getItems().addAll(ApplicationStateController.getAllowedAppointmentTimes());
+        
+        // Add User Names to ComboBox
+        comboBoxUserName.getItems().addAll(usersList);
+        comboBoxCustomerName.getItems().addAll(customersList);
     }
+
+    
 
     @FXML
     private void handleStartTimeComboBox(ActionEvent event) {
@@ -71,9 +91,6 @@ public class NewAppointmentScreenController implements Initializable {
     }
 
 
-    @FXML
-    private void handleAppointmentDurationComboBox(ActionEvent event) {
-    }
 
     @FXML
     private void handleAppointmentUserNameComboBox(ActionEvent event) {
@@ -86,5 +103,19 @@ public class NewAppointmentScreenController implements Initializable {
     @FXML
     private void handleCancelNewAppointmentButton(ActionEvent event) {
     }
+
+    @FXML
+    private void handleAppointmentStartDatePicker(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleAppointmentEndDatePicker(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleEndTimeComboBox(ActionEvent event) {
+    }
+
+
     
 }

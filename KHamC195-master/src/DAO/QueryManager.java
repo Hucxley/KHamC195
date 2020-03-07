@@ -109,7 +109,7 @@ public class QueryManager {
 
         int foundRecord = -1;
         try{
-          String query = " * from address where address = '"+ address1 +"' and postalCode = '" + postalCode +"'";
+          String query = " * from address where address = '" + address1 + "' and postalCode = '" + postalCode +"'";
           
             makeRequest("select", query);
             ResultSet result = getResults();

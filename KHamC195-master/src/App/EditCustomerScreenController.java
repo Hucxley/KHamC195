@@ -112,7 +112,7 @@ public class EditCustomerScreenController implements Initializable {
  
         int cityId = DAO.QueryManager.dataTableHasValueInFieldName("city", "city", city);
         int countryId = DAO.QueryManager.dataTableHasValueInFieldName("country", "country", country);
-        int addressId = DAO.QueryManager.dataTableHasValueInFieldName("address", "address", address1);
+        int addressId = DAO.QueryManager.getExistingAddress(address1, postalCode);
           
         if(countryId == -1){
             try

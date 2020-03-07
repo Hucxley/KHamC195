@@ -10,6 +10,8 @@ import Utilities.DateTimeManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import javafx.collections.FXCollections;
@@ -35,11 +37,11 @@ public class AppointmentDataAccess {
                 String contact = response.getString("contact");
                 String type = response.getString("type");
                 String url = response.getString("url");
-                Calendar start = DateTimeManager.convertToCalendar(response.getString("start"));
-                Calendar end = DateTimeManager.convertToCalendar(response.getString("end"));
-                Calendar createDate = DateTimeManager.convertToCalendar(response.getString("createDate"));
+                ZonedDateTime start = response.getTimestamp("start").toLocalDateTime().atZone(ZoneId.of("UTC"));
+                ZonedDateTime end = response.getTimestamp("end").toLocalDateTime().atZone(ZoneId.of("UTC"));
+                ZonedDateTime createDate = response.getTimestamp("createDate").toLocalDateTime().atZone(ZoneId.of("UTC"));
                 String createdBy = response.getString("createdBy");
-                Calendar lastUpdate = DateTimeManager.convertToCalendar(response.getString("lastUpdate"));
+                ZonedDateTime lastUpdate = response.getTimestamp("lastUpdate").toLocalDateTime().atZone(ZoneId.of("UTC"));
                 String lastUpdateBy = response.getString("lastUpdateBy");
                 
                 Appointment appointment = new Appointment(
@@ -62,7 +64,7 @@ public class AppointmentDataAccess {
                 
                 appointmentList.add(appointment);
             }
-        } catch (SQLException | ParseException ex) {
+        } catch (SQLException ex) {
             System.out.println(ex);
         }
         
@@ -84,11 +86,11 @@ public static ArrayList<Appointment> getAppointmentsByCustomerId(int id){
                 String contact = response.getString("contact");
                 String type = response.getString("type");
                 String url = response.getString("url");
-                Calendar start = DateTimeManager.convertToCalendar(response.getString("start"));
-                Calendar end = DateTimeManager.convertToCalendar(response.getString("end"));
-                Calendar createDate = DateTimeManager.convertToCalendar(response.getString("createDate"));
+                ZonedDateTime start = DateTimeManager.convertToZDT(response.getTimestamp("start"));
+                ZonedDateTime end = DateTimeManager.convertToZDT(response.getTimestamp("end"));
+                ZonedDateTime createDate = DateTimeManager.convertToZDT(response.getTimestamp("createDate"));
                 String createdBy = response.getString("createdBy");
-                Calendar lastUpdate = DateTimeManager.convertToCalendar(response.getString("lastUpdate"));
+                ZonedDateTime lastUpdate = DateTimeManager.convertToZDT(response.getTimestamp("lastUpdate"));
                 String lastUpdateBy = response.getString("lastUpdateBy");
                 
                 Appointment appointment = new Appointment(
@@ -111,7 +113,7 @@ public static ArrayList<Appointment> getAppointmentsByCustomerId(int id){
                 
                 appointmentList.add(appointment);
             }
-        } catch (SQLException | ParseException ex) {
+        } catch (SQLException ex) {
             System.out.println(ex);
         }
         
@@ -134,11 +136,11 @@ public static ArrayList<Appointment> getAppointmentsByCustomerId(int id){
                 String contact = response.getString("contact");
                 String type = response.getString("type");
                 String url = response.getString("url");
-                Calendar start = DateTimeManager.convertToCalendar(response.getString("start"));
-                Calendar end = DateTimeManager.convertToCalendar(response.getString("end"));
-                Calendar createDate = DateTimeManager.convertToCalendar(response.getString("createDate"));
+                ZonedDateTime start = DateTimeManager.convertToZDT(response.getTimestamp("start"));
+                ZonedDateTime end = DateTimeManager.convertToZDT(response.getTimestamp("end"));
+                ZonedDateTime createDate = DateTimeManager.convertToZDT(response.getTimestamp("createDate"));
                 String createdBy = response.getString("createdBy");
-                Calendar lastUpdate = DateTimeManager.convertToCalendar(response.getString("lastUpdate"));
+                ZonedDateTime lastUpdate = DateTimeManager.convertToZDT(response.getTimestamp("lastUpdate"));
                 String lastUpdateBy = response.getString("lastUpdateBy");
                 
                 foundAppointment = new Appointment(
@@ -159,7 +161,7 @@ public static ArrayList<Appointment> getAppointmentsByCustomerId(int id){
                         lastUpdateBy
                 );
             }
-        } catch (SQLException | ParseException ex){
+        } catch (SQLException ex){
             System.out.println(ex);
         }
         
@@ -181,13 +183,13 @@ public static ArrayList<Appointment> getAppointmentsByCustomerId(int id){
                 String contact = response.getString("contact");
                 String type = response.getString("type");
                 String url = response.getString("url");
-                System.out.println(response.getString("start"));
-                System.out.println(response.getString("end"));
-                Calendar start = DateTimeManager.convertToCalendar(response.getString("start"));
-                Calendar end = DateTimeManager.convertToCalendar(response.getString("end"));
-                Calendar createDate = DateTimeManager.convertToCalendar(response.getString("createDate"));
+                System.out.println(response.getTimestamp("start"));
+                System.out.println(response.getTimestamp("end"));
+                ZonedDateTime start = DateTimeManager.convertToZDT(response.getTimestamp("start"));
+                ZonedDateTime end = DateTimeManager.convertToZDT(response.getTimestamp("end"));
+                ZonedDateTime createDate = DateTimeManager.convertToZDT(response.getTimestamp("createDate"));
                 String createdBy = response.getString("createdBy");
-                Calendar lastUpdate = DateTimeManager.convertToCalendar(response.getString("lastUpdate"));
+                ZonedDateTime lastUpdate = DateTimeManager.convertToZDT(response.getTimestamp("lastUpdate"));
                 String lastUpdateBy = response.getString("lastUpdateBy");
                 
                 Appointment appointment = new Appointment(
@@ -210,7 +212,7 @@ public static ArrayList<Appointment> getAppointmentsByCustomerId(int id){
                 
                 appointmentList.add(appointment);
             }
-        } catch (SQLException | ParseException ex) {
+        } catch (SQLException ex) {
             System.out.println(ex);
         }
         

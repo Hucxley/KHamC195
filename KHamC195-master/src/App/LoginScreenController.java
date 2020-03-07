@@ -8,22 +8,18 @@ package App;
 import DAO.AppointmentDataAccess;
 import DAO.DBConnection;
 import DAO.UserDataAccess;
-import DAO.QueryManager;
 import DataModels.Appointment;
 import DataModels.User;
-import Utilities.DateTimeManager;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -78,7 +74,7 @@ public class LoginScreenController implements Initializable {
         
         String inputUser = txtUsername.getText().trim();
         String inputPass = txtPassword.getText().trim();
-        Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        ZonedDateTime currentTime = ZonedDateTime.now();
         boolean authenticatedUser = false;
         User currentUser;
         
@@ -93,7 +89,7 @@ public class LoginScreenController implements Initializable {
                     ArrayList<Appointment> appointments = (ArrayList) AppointmentDataAccess.getAppointmentsByUserId(currentUser.getUserId());
                     System.out.println(appointments.size());
                     appointments.forEach((Appointment appointment) -> {
-                       Calendar startTime = appointment.getStart();
+                       ZonedDateTime startTime = appointment.getStart();
                         int diffBetween = startTime.compareTo(currentTime);
                         System.out.println("difference between appointments: " + diffBetween);
                         
@@ -124,8 +120,8 @@ public class LoginScreenController implements Initializable {
     }
     
     private static void logUserInfo(User user){
-        String timestamp = Utilities.DateTimeManager.getCurrentTimeUTC();
-        String userActivity = timestamp + ": user: " + user.getUsername() + " logged in.";
+        String timestampNow = ZonedDateTime.now(ZoneId.of("UTC")).toString();
+        String userActivity = timestampNow + ": user: " + user.getUsername() + " logged in.";
         Utilities.ActivityLog.logUserActivity(userActivity);
     }
 

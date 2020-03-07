@@ -10,6 +10,8 @@ import Utilities.DateTimeManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 
 /**
@@ -29,9 +31,9 @@ public class AddressDataAccess {
                 int cityId = response.getInt("cityId");
                 String postalCode = response.getString("postalCode");
                 String phone = response.getString("phone");
-                Calendar createDate = DateTimeManager.convertToCalendar(response.getString("createDate"));
+                ZonedDateTime createDate = response.getTimestamp("createDate").toLocalDateTime().atZone(ZoneId.of("UTC"));
                 String createdBy = response.getString("createdBy");
-                Calendar lastUpdate = DateTimeManager.convertToCalendar(response.getString("lastUpdate"));
+                ZonedDateTime lastUpdate = response.getTimestamp("lastUpdate").toLocalDateTime().atZone(ZoneId.of("UTC"));
                 String lastUpdateBy = response.getString("lastUpdateBy");
                 foundAddress = new Address(addressId, addressLine1, addressLine2, cityId, postalCode, phone, createDate, createdBy, lastUpdate, lastUpdateBy);
                 System.out.println(phone);
@@ -40,7 +42,7 @@ public class AddressDataAccess {
                 System.out.println("address not found");
                 return null;
             }
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException e) {
             System.out.println(e);
         }
         

@@ -5,6 +5,7 @@
  */
 package DataModels;
 
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 
 /**
@@ -15,14 +16,14 @@ public class Country {
     
     private int countryId;
     private String countryName;
-    private Calendar createDate;
+    private ZonedDateTime createDate;
     private String createdBy;
-    private Calendar lastUpdate;
+    private ZonedDateTime lastUpdate;
     private String lastUpdateBy;
     
     
     // CONSTRUCTORS
-    public Country(int countryId, String country, Calendar createDate, String createdBy, Calendar lastUpdate, String lastUpdateBy) {
+    public Country(int countryId, String country, ZonedDateTime createDate, String createdBy, ZonedDateTime lastUpdate, String lastUpdateBy) {
         this.countryId = countryId;
         this.countryName = country;
         this.createDate = createDate;
@@ -54,11 +55,11 @@ public class Country {
         this.countryName = countryName;
     }
 
-    public Calendar getCreateDate() {
+    public ZonedDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Calendar createDate) {
+    public void setCreateDate(ZonedDateTime createDate) {
         this.createDate = createDate;
     }
 
@@ -70,11 +71,11 @@ public class Country {
         this.createdBy = createdBy;
     }
 
-    public Calendar getLastUpdate() {
+    public ZonedDateTime getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(Calendar lastUpdate) {
+    public void setLastUpdate(ZonedDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 

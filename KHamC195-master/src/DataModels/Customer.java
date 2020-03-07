@@ -6,6 +6,7 @@
 package DataModels;
 
 import Utilities.DateTimeManager;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 
 /**
@@ -24,9 +25,9 @@ public class Customer {
     private String countryName;
     private String postalCode;
     private boolean active;
-    private Calendar createDate;
+    private ZonedDateTime createDate;
     private String createdBy;
-    private Calendar lastUpdate;
+    private ZonedDateTime lastUpdate;
     private String lastUpdatedDisplay;
     private String lastUpdateBy;
     private String phoneNumber;
@@ -34,7 +35,7 @@ public class Customer {
 
 
     // CONSTRUCTORS
-    public Customer(int customerId, String customerName, int addressId, boolean active, Calendar createDate, String createdBy, Calendar lastUpdated, String lastUpdateBy) {
+    public Customer(int customerId, String customerName, int addressId, boolean active, ZonedDateTime createDate, String createdBy, ZonedDateTime lastUpdated, String lastUpdateBy) {
         this.customerId = customerId;
         this.customerName = customerName;
         this.addressId = addressId;
@@ -48,7 +49,10 @@ public class Customer {
     
     
     // CLASS METHODS
-    
+    @Override
+    public String toString(){
+        return customerName;
+    }
     
     
     // GETTERS & SETTERRS
@@ -93,11 +97,11 @@ public class Customer {
         this.active = active;
     }
 
-    public Calendar getCreateDate() {
+    public ZonedDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Calendar createDate) {
+    public void setCreateDate(ZonedDateTime createDate) {
         this.createDate = createDate;
     }
 
@@ -109,11 +113,11 @@ public class Customer {
         this.createdBy = createdBy;
     }
 
-    public Calendar getLastUpdate() {
+    public ZonedDateTime getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(Calendar lastUpdate) {
+    public void setLastUpdate(ZonedDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 

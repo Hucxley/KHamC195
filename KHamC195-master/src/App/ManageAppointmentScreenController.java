@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Optional;
@@ -77,8 +80,8 @@ public class ManageAppointmentScreenController implements Initializable {
     private Button btnCancelManageAppointments;
     
     Stage stage = ApplicationStateController.getMainStage();
-    private String appointmentFilter;
-    private int userIdFilter;
+    private String appointmentFilterType;
+    private int appointmentFilterId;
     private int customerIdFilter;
     private ObservableList appointmentsViewAllByType;
 
@@ -96,13 +99,14 @@ public class ManageAppointmentScreenController implements Initializable {
     public void setAppointmentsFilter(String apptType, int id){
         System.out.println(apptType);
         if(apptType.matches("all")){
-            this.setAppointmentFilter(apptType);
+            this.setAppointmentFilterType(apptType);
+            this.setAppointmentFilterId(-1);
         } else if(apptType.matches("user")){
-            this.setAppointmentFilter(apptType);
-            this.setUserIdFilter(id);
+            this.setAppointmentFilterType(apptType);
+            this.setAppointmentFilterId(id);
         }else if (apptType.matches("customer")){
-            this.setAppointmentFilter(apptType);
-            this.setCustomerIdFilter(id);
+            this.setAppointmentFilterType(apptType);
+            this.setAppointmentFilterId(id);
         } else {
             System.out.println("appointment filter error!");
         }
@@ -113,12 +117,12 @@ public class ManageAppointmentScreenController implements Initializable {
     
     public void selectAppointmentTableDisplay(){
         try {
-            if(this.getAppointmentFilter().matches("all")){
+            if(this.getAppointmentFilterType().matches("all")){
                 getAllAppointmentData();
-            } else if(this.getAppointmentFilter().matches("user")){
-                getAppointmentsByUserId(this.getUserIdFilter());
-            }else if(this.getAppointmentFilter().matches("customer")){
-                getAppointmentsByCustomerId(this.getCustomerIdFilter());
+            } else if(this.getAppointmentFilterType().matches("user")){
+                getAppointmentsByUserId(this.getAppointmentFilterId());
+            }else if(this.getAppointmentFilterType().matches("customer")){
+                getAppointmentsByCustomerId(this.getAppointmentFilterId());
             }else{
                 System.out.println("error getting appointment data");
             }
@@ -134,8 +138,8 @@ public class ManageAppointmentScreenController implements Initializable {
 
             int userId = appointment.getUserId();
             int customerId = appointment.getCustomerId();
-            Calendar calStart = appointment.getStart();
-            Calendar calEnd = appointment.getEnd();
+            ZonedDateTime calStart = appointment.getStart().toLocalDateTime().atZone(ZoneId.of("UTC"));
+            ZonedDateTime calEnd = appointment.getEnd().toLocalDateTime().atZone(ZoneId.of("UTC"));
             int apptDurationMinutes = (int)ChronoUnit.MINUTES.between(calStart.toInstant(), calEnd.toInstant());
             String apptDurationDisplay = String.valueOf(apptDurationMinutes);
             appointment.setDurationDisplay(apptDurationDisplay);
@@ -144,7 +148,8 @@ public class ManageAppointmentScreenController implements Initializable {
             appointment.setUserNameDisplay(userName);
             String customerName = DAO.CustomerDataAccess.getById(customerId).getCustomerName();
             appointment.setCustomerNameDisplay(customerName);
-            appointment.setStartTimeDisplay(DateTimeManager.toDateTimeString(calStart));
+            appointment.setStartTimeDisplay(calStart.withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss"))); 
+            appointment.setLastUpdateDisplay(appointment.getLastUpdate().withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss")));
             
         });
         
@@ -161,8 +166,8 @@ public class ManageAppointmentScreenController implements Initializable {
             int userId = DAO.UserDataAccess.getById(appointment.getUserId()).getUserId();
             if(userId == id){
                 int customerId = appointment.getCustomerId();
-                Calendar calStart = appointment.getStart();
-                Calendar calEnd = appointment.getEnd();
+                ZonedDateTime calStart = appointment.getStart().toLocalDateTime().atZone(ZoneId.of("UTC"));
+                ZonedDateTime calEnd = appointment.getEnd().toLocalDateTime().atZone(ZoneId.of("UTC"));
                 int apptDurationMinutes = (int)ChronoUnit.MINUTES.between(calStart.toInstant(), calEnd.toInstant());
                 String apptDurationDisplay = String.valueOf(apptDurationMinutes);
                 appointment.setDurationDisplay(apptDurationDisplay);
@@ -171,7 +176,8 @@ public class ManageAppointmentScreenController implements Initializable {
                 appointment.setUserNameDisplay(userName);
                 String customerName = DAO.CustomerDataAccess.getById(customerId).getCustomerName();
                 appointment.setCustomerNameDisplay(customerName);
-                appointment.setStartTimeDisplay(DateTimeManager.toDateTimeString(calStart)); 
+                appointment.setStartTimeDisplay(calStart.withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-mm-dd kk:mm:ss")));
+                appointment.setLastUpdateDisplay(appointment.getLastUpdate().withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss")));
                 userAppointments.add(appointment);
             }
             
@@ -190,17 +196,20 @@ public class ManageAppointmentScreenController implements Initializable {
             int customerId = DAO.CustomerDataAccess.getById(appointment.getCustomerId()).getCustomerId();
             if(customerId == id){
                 int userId = appointment.getUserId();
-                Calendar calStart = appointment.getStart();
-                Calendar calEnd = appointment.getEnd();
+                ZonedDateTime calStart = appointment.getStart().toLocalDateTime().atZone(ZoneId.of("UTC"));
+                ZonedDateTime calEnd = appointment.getEnd().toLocalDateTime().atZone(ZoneId.of("UTC"));
                 int apptDurationMinutes = (int)ChronoUnit.MINUTES.between(calStart.toInstant(), calEnd.toInstant());
                 String apptDurationDisplay = String.valueOf(apptDurationMinutes);
                 appointment.setDurationDisplay(apptDurationDisplay);
+                
+                System.out.println(calStart.toString());
 
                 String userName = DAO.UserDataAccess.getById(userId).getUsername();
                 appointment.setUserNameDisplay(userName);
                 String customerName = DAO.CustomerDataAccess.getById(customerId).getCustomerName();
                 appointment.setCustomerNameDisplay(customerName);
-                appointment.setStartTimeDisplay(DateTimeManager.toDateTimeString(calStart)); 
+                appointment.setStartTimeDisplay(calStart.withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-mm-dd kk:mm:ss")));
+                appointment.setLastUpdateDisplay(appointment.getLastUpdate().withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss")));
                 customerAppointments.add(appointment);
             }
             
@@ -236,11 +245,11 @@ public class ManageAppointmentScreenController implements Initializable {
 
     @FXML
     private void handleBtnAppointmentViewWeek(ActionEvent event) {
-        Calendar now = Calendar.getInstance();
+        ZonedDateTime now = ZonedDateTime.now();
         ObservableList<Appointment> appointments = this.getAppointmentsViewAllByType();
         ObservableList<Appointment> appointmentsForWeek = FXCollections.observableArrayList();
         appointments.forEach(appointment -> {
-            Calendar start = appointment.getStart();
+            ZonedDateTime start = appointment.getStart();
             int daysUntilAppointment = (int) ChronoUnit.DAYS.between(now.toInstant(),start.toInstant());
             System.out.println(daysUntilAppointment);
             if(daysUntilAppointment >= 0 && daysUntilAppointment <= 7){
@@ -253,11 +262,11 @@ public class ManageAppointmentScreenController implements Initializable {
 
     @FXML
     private void handleBtnAppointmentViewMonth(ActionEvent event) {
-        Calendar now = Calendar.getInstance();
+        ZonedDateTime now = ZonedDateTime.now();
         ObservableList<Appointment> appointments = this.getAppointmentsViewAllByType();
         ObservableList<Appointment> appointmentsForWeek = FXCollections.observableArrayList();
         appointments.forEach(appointment -> {
-            Calendar start = appointment.getStart();
+            ZonedDateTime start = appointment.getStart();
             int daysUntilAppointment = (int) ChronoUnit.DAYS.between(now.toInstant(),start.toInstant());
             System.out.println(daysUntilAppointment);
             if(daysUntilAppointment >= 0 && daysUntilAppointment <= 30){
@@ -280,6 +289,31 @@ public class ManageAppointmentScreenController implements Initializable {
 
     @FXML
     private void handleEditAppointmentButton(ActionEvent event) {
+        try
+        {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("EditAppointmentScreen.fxml"));
+            loader.load();
+
+            EditAppointmentScreenController EASController = loader.getController();
+            Appointment appointmentToEdit = tableManageAppointments.getSelectionModel().getSelectedItem();
+
+            if(appointmentToEdit != null){
+                EASController.setAppointmentToEdit(appointmentToEdit);
+                EASController.setFilterType(this.getAppointmentFilterType());
+                EASController.setFilterId(this.getAppointmentFilterId());
+
+                stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+                Parent scene = loader.getRoot();
+                stage.setScene(new Scene(scene));
+                stage.show();
+            } else {
+                // TODO SHOW ALERT THAT APPOINTMENT MUST BE SELECTED TO EDIT
+            }
+
+        }catch(IOException ex){
+            System.out.println(ex);
+        }
     }
 
     @FXML
@@ -290,20 +324,20 @@ public class ManageAppointmentScreenController implements Initializable {
     private void handleCancelManageAppointmentsButton(ActionEvent event) {
     }
 
-    public String getAppointmentFilter() {
-        return appointmentFilter;
+    public String getAppointmentFilterType() {
+        return appointmentFilterType;
     }
 
-    public void setAppointmentFilter(String appointmentFilter) {
-        this.appointmentFilter = appointmentFilter;
+    public void setAppointmentFilterType(String appointmentFilterType) {
+        this.appointmentFilterType = appointmentFilterType;
     }
 
-    public int getUserIdFilter() {
-        return userIdFilter;
+    public int getAppointmentFilterId() {
+        return appointmentFilterId;
     }
 
-    public void setUserIdFilter(int userIdFilter) {
-        this.userIdFilter = userIdFilter;
+    public void setAppointmentFilterId(int appointmentFilterId) {
+        this.appointmentFilterId = appointmentFilterId;
     }
 
     public int getCustomerIdFilter() {

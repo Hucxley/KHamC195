@@ -10,6 +10,7 @@ import Utilities.DateTimeManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 
 /**
@@ -26,9 +27,9 @@ public class CityDataAccess {
                 int cityId = response.getInt("cityId");
                 String cityName = response.getString("city");
                 int countryId = response.getInt("countryId");
-                Calendar createDate = DateTimeManager.convertToCalendar(response.getString("createDate"));
+                ZonedDateTime createDate = DateTimeManager.dateStringToLocalZDT(response.getString("createDate"));
                 String createdBy = response.getString("createdBy");
-                Calendar lastUpdate = DateTimeManager.convertToCalendar(response.getString("lastUpdate"));
+                ZonedDateTime lastUpdate = DateTimeManager.dateStringToLocalZDT(response.getString("lastUpdate"));
                 String lastUpdateBy = response.getString("lastUpdateBy");
                 foundCity = new City(cityId, cityName, countryId, createDate, createdBy, lastUpdate, lastUpdateBy);
                 return foundCity;
