@@ -5,21 +5,32 @@
  */
 package App;
 
+import DAO.QueryManager;
 import DataModels.Customer;
 import DataModels.User;
+import Utilities.DateTimeManager;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -82,7 +93,6 @@ public class EditCustomerScreenController implements Initializable {
         txtCountryName.setText(customer.getCountryName());
         txtPostalCode.setText(customer.getPostalCode());
         
-        System.out.println(customer.getPhoneNumber());
         
     }
 
@@ -97,7 +107,7 @@ public class EditCustomerScreenController implements Initializable {
 
     @FXML
     private void handleSaveCustomerChangesButton(ActionEvent event) throws IOException {
-        java.sql.Date sqlNow = new java.sql.Date(new Date().getTime());
+        Timestamp sqlNow = DateTimeManager.zdtLocalToTimestampSQL(ZonedDateTime.now());
         int isActive = 0;
         String currentUserName = currentUser.getUsername();
         int customerID = selectedCustomer.getCustomerId();
@@ -105,7 +115,7 @@ public class EditCustomerScreenController implements Initializable {
         String name = txtCustomerName.getText();
         String phone = txtCustomerPhone.getText();
         String address1 = txtAddress1.getText();
-        String address2 = txtAddress2.getText();
+        String address2 = txtAddress2.getText() + " ";
         String city = txtCity.getText();
         String country = txtCountryName.getText();
         String postalCode = txtPostalCode.getText();
@@ -113,31 +123,49 @@ public class EditCustomerScreenController implements Initializable {
         int cityId = DAO.QueryManager.dataTableHasValueInFieldName("city", "city", city);
         int countryId = DAO.QueryManager.dataTableHasValueInFieldName("country", "country", country);
         int addressId = DAO.QueryManager.getExistingAddress(address1, postalCode);
-          
-        if(countryId == -1){
-            try
-            {
-                String countryInsertQuery = " into country (country) values '" + country + "'";
-                String countrySelectQuery = " from country where country = '" + country + "'";
-                DAO.QueryManager.makeRequest("insert", countryInsertQuery);
-                DAO.QueryManager.makeRequest("select", countrySelectQuery);
-                ResultSet results = DAO.QueryManager.getResults();
-                while(results.next()){
-                    if(results.getString("country").matches(country)){
-                        countryId = results.getInt("countryId");
-                    }
-                }
+        
+        if(!boolIsActive){
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Delete Customer Request");
+            confirmAlert.setHeaderText("Deleting Customers Cannot Be Reversed!");
+            confirmAlert.setContentText("Are you sure you want to remove this customer and all appointments?");
 
-            } catch(SQLException ex){
-                System.out.println(ex);
+            Optional<ButtonType> response = confirmAlert.showAndWait();
+            if(response.get() == ButtonType.OK){
+                setCustomerInactive(this.getSelectedCustomer());
+                deleteCustomerAppointments(this.getSelectedCustomer());
+
+            } else {
+                checkBoxCustomerActive.setSelected(true);
+                confirmAlert.hide();
             }
-        }
+        } else {
+            if(countryId == -1){
+                try
+                {
+                    String countryInsertQuery = " into country (country, createDate, createdBy, lastUpdate, lastUpdateBy) values ('";
+                    countryInsertQuery += country + "', '" + sqlNow + "', '" + currentUserName + "', '" + sqlNow + "', '" + currentUserName + "')";
+                    String countrySelectQuery = "* from country where country = '" + country + "'";
+                    DAO.QueryManager.makeRequest("insert", countryInsertQuery);
+                    DAO.QueryManager.makeRequest("select", countrySelectQuery);
+                    ResultSet results = DAO.QueryManager.getResults();
+                    while(results.next()){
+                        if(results.getString("country").matches(country)){
+                            countryId = results.getInt("countryId");
+                        }
+                    }
+
+                } catch(SQLException ex){
+                    System.out.println(ex);
+                }
+            }
 
         if(cityId == -1){
             try
             {
-                String cityInsertQuery = " into city (city, countryId) values '" + city + ", '" + countryId +"'";
-                String citySelectQuery = " from city where city = '" + city + "'";
+                String cityInsertQuery = " into city (city, countryId, createDate, createdBy, lastUpdate, lastUpdateBy) values ('";
+                cityInsertQuery += city + "', " + countryId + ", '" + sqlNow + "', '" + currentUserName + "', '" + sqlNow + "', '" + currentUserName + "')";
+                String citySelectQuery = " * from city where city = '" + city + "'";
                 DAO.QueryManager.makeRequest("insert", cityInsertQuery);
                 DAO.QueryManager.makeRequest("select", citySelectQuery);
                 ResultSet results = DAO.QueryManager.getResults();
@@ -153,14 +181,13 @@ public class EditCustomerScreenController implements Initializable {
         }
         
         if(addressId == -1){
-             try
+            try
             {
                 String addressInsertQuery = " into address (address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdate, lastUpdateBy) values ('";
                 addressInsertQuery += address1 + "', '";
                 addressInsertQuery += address2 + "', " + cityId + ", '" + postalCode + "', '" + phone +"', '";
                 addressInsertQuery += sqlNow + "', '" + currentUserName + "', '" + sqlNow + "', '" + currentUserName +"')";   
                 String addressSelectQuery = "* from address where address = '" + address1 + "'";
-                System.out.println(addressInsertQuery);
                 DAO.QueryManager.makeRequest("insert", addressInsertQuery);
                 DAO.QueryManager.makeRequest("select", addressSelectQuery);
                 ResultSet results = DAO.QueryManager.getResults();
@@ -190,12 +217,9 @@ public class EditCustomerScreenController implements Initializable {
             }
         }
             
-
-        if(boolIsActive){
-            isActive = 1;
-        }
-        try{
-            
+        isActive = 1;
+        try
+        {
             String queryBody = " customer SET ";
             queryBody += "customerName = '" + name + "', " ;
             queryBody += "addressId = " + addressId + ", " ;
@@ -203,9 +227,11 @@ public class EditCustomerScreenController implements Initializable {
             queryBody += "lastUpdate = '" + sqlNow + "', " ;
             queryBody += "lastUpdateBy = '" + currentUserName + "' WHERE customerId = " + customerID;     
             DAO.QueryManager.makeRequest("update", queryBody);
-            
+
         } catch(SQLException ex){
             System.out.println(ex);
+        }
+
         }
         
         Parent root = FXMLLoader.load(getClass().getResource("ManageCustomersScreen.fxml"));
@@ -215,6 +241,36 @@ public class EditCustomerScreenController implements Initializable {
         stage.setScene(scene);
         stage.centerOnScreen();
         stage.show();
+        
+    }
+    
+    private void setCustomerInactive(Customer customer){
+        try {
+            String queryBody = " customer set active = 0 where customerId = " + customer.getCustomerId();
+            QueryManager.makeRequest("update", queryBody);
+            ResultSet customerRecord = QueryManager.getResults();
+            while(customerRecord.next()){
+                if(customerRecord.getInt("active") != 0){
+                    System.out.println("error deleting customer record");
+                }
+            }
+            
+        } catch (SQLException ex){
+            System.out.println(ex);
+        }
+    }
+    
+    private void deleteCustomerAppointments(Customer customer) throws IOException{
+        try {
+            String queryBody = (" from appointment where customerId = " + customer.getCustomerId());
+            QueryManager.makeRequest("DELETE", queryBody);
+            ResultSet appointments = QueryManager.getResults();
+            if(appointments.next()){
+                System.out.println("Appointment delete error");
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex);
+        }
     
     }
     
@@ -229,6 +285,14 @@ public class EditCustomerScreenController implements Initializable {
         stage.setScene(scene);
         stage.centerOnScreen();
         stage.show();
+    }
+
+    public Customer getSelectedCustomer() {
+        return selectedCustomer;
+    }
+
+    public void setSelectedCustomer(Customer selectedCustomer) {
+        this.selectedCustomer = selectedCustomer;
     }
     
 }

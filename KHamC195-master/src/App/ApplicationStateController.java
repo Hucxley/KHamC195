@@ -17,6 +17,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -31,6 +33,8 @@ public class ApplicationStateController extends Application {
     private static Customer selectedCustomer;
     private static User activeUser;
     private static ObservableList<String> allowedAppointmentTimes = FXCollections.observableArrayList();
+    private static ObservableList<String> allowedAppointmentTypes = FXCollections.observableArrayList();
+    
     
     
     private static void populateAppointmentTimes(){
@@ -44,7 +48,7 @@ public class ApplicationStateController extends Application {
         int currentHour;
         String displayHour = "";
         String prefix;
-        for(int i = 0; i < totalAppointmentHours; i++){
+        for(int i = 0; i <= totalAppointmentHours; i++){
             currentHour = startHour + i; // advance the current hour with i
             if(currentHour < 10){
                 prefix = "0";
@@ -92,13 +96,18 @@ public class ApplicationStateController extends Application {
     public static ObservableList<String> getAllowedAppointmentTimes() {
         return allowedAppointmentTimes;
     }
+
+    public static ObservableList<String> getAllowedAppointmentTypes() {
+        return allowedAppointmentTypes;
+    }
     
     @Override
     public void start(Stage stage) throws Exception {
-
+        populateAppointmentTypes();
         populateAppointmentTimes();
         setStage(stage);
-        Parent root = FXMLLoader.load(getClass().getResource("LoginScreen.fxml"));
+        
+        Parent root = FXMLLoader.load(getClass().getResource("LoginScreen.fxml"), ResourceBundle.getBundle("Resources/Bundle", Locale.getDefault()));
         
         Scene scene = new Scene(root);
         
@@ -130,6 +139,10 @@ public class ApplicationStateController extends Application {
      */
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private void populateAppointmentTypes() {
+        allowedAppointmentTypes.addAll("Presentation","Scrum", "Consultation", "Feedback", "Progress Update", "Follow Up", "Marketing", "Sales");
     }
 
     

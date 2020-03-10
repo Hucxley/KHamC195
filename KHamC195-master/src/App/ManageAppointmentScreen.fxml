@@ -42,7 +42,7 @@
                   <TableColumn fx:id="colAppointmentId" editable="false" prefWidth="43.0" resizable="false" text="Id" />
                   <TableColumn fx:id="colCustomerName" editable="false" prefWidth="143.0" resizable="false" text="Customer" />
                   <TableColumn fx:id="colUserName" editable="false" prefWidth="100.0" resizable="false" text="User" />
-                  <TableColumn fx:id="colAppointmentLocation" editable="false" prefWidth="137.0" resizable="false" text="Location" />
+                  <TableColumn fx:id="colAppointmentType" editable="false" prefWidth="137.0" resizable="false" text="Type" />
                   <TableColumn fx:id="colAppointmentStartTime" editable="false" prefWidth="159.0" resizable="false" text="Appt Start" />
                   <TableColumn fx:id="colAppointmentDuration" editable="false" prefWidth="64.0" resizable="false" text="Minutes" />
                   <TableColumn fx:id="colDateLastUpdated" editable="false" prefWidth="160.0" resizable="false" text="Last Updated" />

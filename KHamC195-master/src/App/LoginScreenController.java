@@ -12,21 +12,22 @@ import DataModels.Appointment;
 import DataModels.User;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.TimeZone;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -48,6 +49,7 @@ public class LoginScreenController implements Initializable {
     private AnchorPane loginAnchor;
     
     Stage stage; 
+    private boolean allNotificationsViewed = true;
     
     private static void setActiveUser(User user){
         ApplicationStateController.setActiveUser(user);
@@ -62,11 +64,20 @@ public class LoginScreenController implements Initializable {
     }
     @FXML
     private Button btnLoginSubmit;
+    
+    private ResourceBundle languages;
+
 
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        System.out.println(rb.getLocale());
+        System.out.println(Locale.getDefault());
+        languages = rb;
+        btnLoginSubmit.setText(languages.getString("SUBMIT"));
+        txtUsername.setPromptText(languages.getString("USERNAME_PROMPT"));
+        txtPassword.setPromptText(languages.getString("PASSWORD_PROMPT"));
     }    
 
     @FXML
@@ -77,21 +88,36 @@ public class LoginScreenController implements Initializable {
         ZonedDateTime currentTime = ZonedDateTime.now();
         boolean authenticatedUser = false;
         User currentUser;
+
+
         
         if(!authenticatedUser){
             DBConnection.startConnection();       
-
-
             currentUser = UserDataAccess.getByUsername(txtUsername.getText().trim());
             if(currentUser != null){
                 authenticatedUser = (inputUser.equals(currentUser.getUsername()) && inputPass.equals(currentUser.getPassword()));
                 if(authenticatedUser){
                     ArrayList<Appointment> appointments = (ArrayList) AppointmentDataAccess.getAppointmentsByUserId(currentUser.getUserId());
-                    System.out.println(appointments.size());
-                    appointments.forEach((Appointment appointment) -> {
-                       ZonedDateTime startTime = appointment.getStart();
-                        int diffBetween = startTime.compareTo(currentTime);
-                        System.out.println("difference between appointments: " + diffBetween);
+                    appointments.forEach(appointment -> {
+                        System.out.println(currentTime);
+                        ZonedDateTime startTime = appointment.getStart();
+                        System.out.println("appointment start time: " + startTime );
+                        int diffBetween = (int) currentTime.until(startTime, ChronoUnit.MINUTES);
+                        System.out.println("time until next appointments: " + diffBetween);
+                        if(diffBetween >= 0 && diffBetween <= 15){
+                            this.setAllNotificationsViewed(false);
+                            Alert confirmAlert = new Alert(Alert.AlertType.WARNING);
+                            
+                            confirmAlert.setTitle(languages.getString("ALERT_TITLE"));
+                            confirmAlert.setHeaderText(java.text.MessageFormat.format(languages.getString("ALERT_HEADER"), new Object[] {diffBetween}));
+                            confirmAlert.setContentText(languages.getString("ALERT_TEXT"));
+
+                            Optional<ButtonType> response = confirmAlert.showAndWait();
+                             if(response.get() == ButtonType.OK){
+                                 this.setAllNotificationsViewed(true);
+                             }
+                            
+                        }
                         
                     });
                     
@@ -104,20 +130,32 @@ public class LoginScreenController implements Initializable {
         System.out.println("user authenticated: " + authenticatedUser);
         
         if(!authenticatedUser){
-            label.setText("Unable verify username/password. Please try again.");
+            label.setText(languages.getString("LOGIN_ERROR"));
         }else{
-            
-            stage = ApplicationStateController.getMainStage();
-            label.setText("Login Successful!");
-            Parent root = FXMLLoader.load(getClass().getResource("UserScreen.fxml"));
-        
-            Scene scene = new Scene(root);
+            if(this.getAllNotificationsViewed()){
+                
+                stage = ApplicationStateController.getMainStage();
+                label.setText("Login Successful!");
+                Parent root = FXMLLoader.load(getClass().getResource("UserScreen.fxml"));
 
-            stage.setScene(scene);
-            stage.centerOnScreen();
-            stage.show();
+                Scene scene = new Scene(root);
+
+                stage.setScene(scene);
+                stage.centerOnScreen();
+                stage.show();
+                
+            }
         }
     }
+
+    public boolean getAllNotificationsViewed() {
+        return allNotificationsViewed;
+    }
+
+    public void setAllNotificationsViewed(boolean allNotificationsViewed) {
+        this.allNotificationsViewed = allNotificationsViewed;
+    }
+ 
     
     private static void logUserInfo(User user){
         String timestampNow = ZonedDateTime.now(ZoneId.of("UTC")).toString();
@@ -125,10 +163,6 @@ public class LoginScreenController implements Initializable {
         Utilities.ActivityLog.logUserActivity(userActivity);
     }
 
-    private Appointment QueryManager(String select, String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 
     
 }

@@ -31,6 +31,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -100,45 +101,45 @@ public class ManageCustomersScreenController implements Initializable {
      * @throws ParseException 
      */
     public void getAllCustomerData() throws SQLException, ParseException{
-    ObservableList <Customer> customerList = FXCollections.observableArrayList();
-    ResultSet response = QueryManager.getDataFromTable("customer");
-    while(response.next()){
-        int customerId = response.getInt("customerId");
-        String customerName = response.getString("customerName");
-        boolean active = response.getBoolean("active");
-        int customerAddressId = response.getInt("addressId");
-        ZonedDateTime createdDate = DateTimeManager.dateStringToLocalZDT(response.getString("createDate"));
-        String createdBy = response.getString("createdBy");
-        ZonedDateTime lastUpdated = DateTimeManager.dateStringToLocalZDT(response.getString("lastUpdate"));
-        String lastUpdatedBy = response.getString("lastUpdateBy");
-        Customer nextCustomer = new Customer(customerId, customerName, customerAddressId, active, createdDate, createdBy, lastUpdated, lastUpdatedBy);
-        customerList.add(nextCustomer);
-    };
-    
-    // LAMBDA to consume each customer object in list and set remaining values through database calls before addding customer to tableview
-    customerList.forEach(customer -> {
-        int addressId = customer.getAddressId();
-        Address customerAddress = DAO.AddressDataAccess.getById(addressId);
-        City customerCity = DAO.CityDataAccess.getById(customerAddress.getCityId());
-        Country customerCountry = DAO.CountryDataAccess.getById(customerCity.getCountryId());
-        customer.setStreetAddress(customerAddress.getAddress());
-        customer.setStreetAddress2(customerAddress.getAddress2());
-        customer.setStreetAddressDisplay(); // CONCAT Address and Address2 for display in table in single cell
-        customer.setCityName(customerCity.getCityName());
-        customer.setCountryName(customerCountry.getCountryName());
-        customer.setPhoneNumber(customerAddress.getPhone());
-        customer.setPostalCode(customerAddress.getPostalCode());
-        tableManageCustomers.getItems().add(customer);
-    });
-    
-    colCustomerId.setCellValueFactory(new PropertyValueFactory<>("customerId"));
-    colCustomerName.setCellValueFactory(new PropertyValueFactory<>("customerName"));
-    colCustomerActive.setCellValueFactory(new PropertyValueFactory<>("active"));
-    colCustomerStreetAddress.setCellValueFactory(new PropertyValueFactory<>("streetAddressDisplay"));
-    colCustomerCity.setCellValueFactory(new PropertyValueFactory<>("cityName"));
-    colCustomerCountry.setCellValueFactory(new PropertyValueFactory<>("countryName"));
-    colCustomerPostalCode.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
-    colDateLastUpdated.setCellValueFactory(new PropertyValueFactory<>("lastUpdatedDisplay"));
+        ObservableList <Customer> customerList = FXCollections.observableArrayList();
+        ResultSet response = QueryManager.getDataFromTable("customer");
+        while(response.next()){
+            int customerId = response.getInt("customerId");
+            String customerName = response.getString("customerName");
+            boolean active = response.getBoolean("active");
+            int customerAddressId = response.getInt("addressId");
+            ZonedDateTime createdDate = DateTimeManager.dateStringToLocalZDT(response.getString("createDate"));
+            String createdBy = response.getString("createdBy");
+            ZonedDateTime lastUpdated = DateTimeManager.dateStringToLocalZDT(response.getString("lastUpdate"));
+            String lastUpdatedBy = response.getString("lastUpdateBy");
+            Customer nextCustomer = new Customer(customerId, customerName, customerAddressId, active, createdDate, createdBy, lastUpdated, lastUpdatedBy);
+            customerList.add(nextCustomer);
+        };
+        tableManageCustomers.getItems().clear();
+        // LAMBDA to consume each customer object in list and set remaining values through database calls before addding customer to tableview
+        customerList.forEach(customer -> {
+            int addressId = customer.getAddressId();
+            Address customerAddress = DAO.AddressDataAccess.getById(addressId);
+            City customerCity = DAO.CityDataAccess.getById(customerAddress.getCityId());
+            Country customerCountry = DAO.CountryDataAccess.getById(customerCity.getCountryId());
+            customer.setStreetAddress(customerAddress.getAddress());
+            customer.setStreetAddress2(customerAddress.getAddress2());
+            customer.setStreetAddressDisplay(); // CONCAT Address and Address2 for display in table in single cell
+            customer.setCityName(customerCity.getCityName());
+            customer.setCountryName(customerCountry.getCountryName());
+            customer.setPhoneNumber(customerAddress.getPhone());
+            customer.setPostalCode(customerAddress.getPostalCode());
+            tableManageCustomers.getItems().add(customer);
+        });
+
+        colCustomerId.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+        colCustomerName.setCellValueFactory(new PropertyValueFactory<>("customerName"));
+        colCustomerActive.setCellValueFactory(new PropertyValueFactory<>("active"));
+        colCustomerStreetAddress.setCellValueFactory(new PropertyValueFactory<>("streetAddressDisplay"));
+        colCustomerCity.setCellValueFactory(new PropertyValueFactory<>("cityName"));
+        colCustomerCountry.setCellValueFactory(new PropertyValueFactory<>("countryName"));
+        colCustomerPostalCode.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
+        colDateLastUpdated.setCellValueFactory(new PropertyValueFactory<>("lastUpdatedDisplay"));
         
     }
 
@@ -186,7 +187,7 @@ public class ManageCustomersScreenController implements Initializable {
         Optional<ButtonType> response = confirmAlert.showAndWait();
         if(response.get() == ButtonType.OK){
             setCustomerInactive(selectedCustomer);
-            //deleteCustomerAppointments(selectedCustomer);
+            deleteCustomerAppointments(selectedCustomer);
             
         }else{
             confirmAlert.hide();
@@ -195,12 +196,13 @@ public class ManageCustomersScreenController implements Initializable {
     
     private void setCustomerInactive(Customer customer){
         try {
-            String queryBody = ("* from customer where customerId = " + customer.getCustomerId());
-            QueryManager.makeRequest("select", queryBody);
+            String queryBody = " customer set active = 0 where customerId = " + customer.getCustomerId();
+            QueryManager.makeRequest("update", queryBody);
             ResultSet customerRecord = QueryManager.getResults();
             while(customerRecord.next()){
-                customerRecord.updateInt("active", 0);
-                customerRecord.updateRow();
+                if(customerRecord.getInt("active") != 0){
+                    System.out.println("error deleting customer record");
+                }
             }
             
         } catch (SQLException ex){
@@ -210,17 +212,23 @@ public class ManageCustomersScreenController implements Initializable {
     
     private void deleteCustomerAppointments(Customer customer){
         try {
-            String queryBody = ("* from appointment where customerId = " + customer.getCustomerId());
-            QueryManager.makeRequest("select", queryBody);
+            String queryBody = (" from appointment where customerId = " + customer.getCustomerId());
+            QueryManager.makeRequest("DELETE", queryBody);
             ResultSet appointments = QueryManager.getResults();
-            while(appointments.next()){
-                appointments.updateString("customerId", null);
-                appointments.updateString("userId", null);
-                appointments.updateRow();
+            if(appointments.next()){
+                System.out.println("Appointment delete error");
             }
         } catch(SQLException ex) {
             System.out.println(ex);
         }
+        
+        try {
+           getAllCustomerData();
+        } catch (SQLException | ParseException ex) {
+           Logger.getLogger(ManageUsersScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
 
         
     }
@@ -237,24 +245,36 @@ public class ManageCustomersScreenController implements Initializable {
 
     @FXML
     private void handleViewCustomerAppointmentsButton(ActionEvent event) {
-         try
-        {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("ManageAppointmentScreen.fxml"));
-            loader.load();
-
-            ManageAppointmentScreenController MASController = loader.getController();
-             int custId = tableManageCustomers.getSelectionModel().getSelectedItem().getCustomerId();
+        Customer selectedCustomer = tableManageCustomers.getSelectionModel().getSelectedItem();
+        boolean customerIsActive = selectedCustomer.getActive();
+        if(!customerIsActive){
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Customer Inactive");
+            alert.setContentText("Inactive Customers do not have appointments. Please select another customer.");
             
-            MASController.setAppointmentsFilter("customer", custId);
+            alert.showAndWait();
+            
+        }else{
+            try
+            {
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("ManageAppointmentScreen.fxml"));
+                loader.load();
 
-            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-            Parent scene = loader.getRoot();
-            stage.setScene(new Scene(scene));
-            stage.show();
-        }catch(Exception ex){
-            System.out.println(ex);
+                ManageAppointmentScreenController MASController = loader.getController();
+                 int custId = tableManageCustomers.getSelectionModel().getSelectedItem().getCustomerId();
+
+                MASController.setAppointmentsFilter("customer", custId);
+
+                stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+                Parent scene = loader.getRoot();
+                stage.setScene(new Scene(scene));
+                stage.show();
+            }catch(Exception ex){
+                System.out.println(ex);
+            }
         }
+         
     }
 
     

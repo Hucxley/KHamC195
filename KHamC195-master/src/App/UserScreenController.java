@@ -40,6 +40,8 @@ public class UserScreenController implements Initializable {
     private Button btnViewCustomers;
     @FXML
     private Button btnViewUsers;
+    @FXML
+    private Button btnViewReports;
     
     /**
      * Initializes the controller class.
@@ -137,6 +139,19 @@ public class UserScreenController implements Initializable {
         stage.centerOnScreen();
         stage.show();
         
+    }
+
+    @FXML
+    private void handleViewReportsButton(ActionEvent event) throws IOException {
+        // TODO MAKE SELECT REPORTS VIEW AND HANDLE IT HERE
+        Stage stage = ApplicationStateController.getMainStage();
+        Parent root = FXMLLoader.load(getClass().getResource("ManageUsersScreen.fxml"));
+        
+        Scene scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.show();
     }
 
         

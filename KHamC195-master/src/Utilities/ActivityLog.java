@@ -5,29 +5,29 @@
  */
 package Utilities;
 
-import java.io.IOException;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 
 /**
  *
  * @author Kenneth Ham
  */
 public class ActivityLog {
-    private static FileHandler LOGFILE;
-    private static final Logger USERLOG = Logger.getLogger("KHamC195.Utilities.ActivityLog");
-    
-    private static void initLogFile() throws IOException{
-        LOGFILE = new FileHandler("./activity-log.txt", true);
-        USERLOG.addHandler(LOGFILE);
-        USERLOG.setLevel(Level.INFO);
-        
-    }
+
     
     public static void logUserActivity(String logInfo){
-        //String utcTimeStamp = DateTimeManager
-        USERLOG.info(logInfo);
+                
+        try {
+            PrintWriter pw = new PrintWriter(new FileOutputStream(
+                    new File("ActivityLog.txt"),
+                    true /* append = true */));
+            pw.append(logInfo + "\n");
+            pw.close();
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex);
+        }
        
         
     }

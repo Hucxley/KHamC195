@@ -31,6 +31,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -72,6 +74,8 @@ public class EditAppointmentScreenController implements Initializable {
     @FXML
     private ComboBox<String> comboBoxEndTime;
     @FXML
+    private ComboBox<String> comboBoxAppointmentType;
+    @FXML
     private Label txtHeader;
     @FXML
     private Button btnEditAppointmentSave;
@@ -84,16 +88,11 @@ public class EditAppointmentScreenController implements Initializable {
     Stage stage = ApplicationStateController.getMainStage();
     private ObservableList<Customer> customerListItems = FXCollections.observableArrayList();
     private ObservableList<User> userListItems = FXCollections.observableArrayList();
-    Customer selectedCustomerFromList;
-    User selectedUserFromList;
+    private Customer selectedCustomerFromList;
+    private User selectedUserFromList;
     private String filterType;
     private int filterId;
 
-
-
-
-
-    
 
 
     /**
@@ -122,6 +121,7 @@ public class EditAppointmentScreenController implements Initializable {
         System.out.println(usersList.size());
         ObservableList<Customer> customersList = DAO.CustomerDataAccess.getCustomers();
         System.out.println(usersList.size());
+        ObservableList<String> appointmentTypes = ApplicationStateController.getAllowedAppointmentTypes();
         int appointmentUserId = appointment.getUserId();
         int appointmentCustomerId = appointment.getCustomerId();
         
@@ -135,6 +135,7 @@ public class EditAppointmentScreenController implements Initializable {
         datePickerAppointmentEndDate.setValue(appointmentEndDate);
         comboBoxStartTime.getItems().addAll(ApplicationStateController.getAllowedAppointmentTimes());
         comboBoxEndTime.getItems().addAll(ApplicationStateController.getAllowedAppointmentTimes());
+        comboBoxAppointmentType.getItems().addAll(appointmentTypes);
         
         // Get index of appointment time in comboBox item list to set selected times on view load
         System.out.println(appointmentStartTime.toString());
@@ -154,17 +155,20 @@ public class EditAppointmentScreenController implements Initializable {
         
         // Lambda to compare ids in custmerList to match the customerId for the appointment to set selected on view load
         customersList.forEach(customer -> {
-            this.getCustomerListItems().add(customer);
-            comboBoxCustomerName.getItems().add(customer.getCustomerName());
-            if(customer.getCustomerId() == appointmentCustomerId){
-                this.customerFoundInList = customer;
-                this.selectedCustomerFromList = customer;
+            if(customer.getActive()){
+                this.getCustomerListItems().add(customer);
+                comboBoxCustomerName.getItems().add(customer.getCustomerName());
+                if(customer.getCustomerId() == appointmentCustomerId){
+                    this.customerFoundInList = customer;
+                    this.selectedCustomerFromList = customer;
+                }
             }
+
         });
         
         comboBoxUserName.getSelectionModel().select(userFoundInList.getUsername());
         comboBoxCustomerName.getSelectionModel().select(customerFoundInList.getCustomerName());
-        
+        comboBoxAppointmentType.getSelectionModel().select(appointment.getType());
         comboBoxStartTime.getSelectionModel().select(appointmentStartTimeIndex);
         comboBoxEndTime.getSelectionModel().select(appointmentEndTimeIndex);
         
@@ -196,14 +200,15 @@ public class EditAppointmentScreenController implements Initializable {
     private void handleEditAppointmentSaveButton(ActionEvent event) throws ParseException, IOException {
 
         String currentActiveUsername = ApplicationStateController.getActiveUser().getUsername();
-        boolean validAppointmentEdit = false;
-        Appointment editedAppointment = this.getApptToEdit();
+        boolean validAppointmentEdit = true;
+        Appointment editedAppointment = this.apptToEdit;
         User selectedUser = selectedUserFromList;
         Customer selectedCustomer = selectedCustomerFromList;
         int selectedUserId = selectedUser.getUserId();
         int originalUserId = editedAppointment.getUserId();
         int selectedCustomerId = selectedCustomer.getCustomerId();
         int originalCustomerId = editedAppointment.getCustomerId();
+        String type = comboBoxAppointmentType.getValue();
         String title = txtAppointmentTitle.getText();
         String description = txtAppointmentDescription.getText();
         String location = txtAppointmentLocation.getText();
@@ -223,9 +228,15 @@ public class EditAppointmentScreenController implements Initializable {
         Timestamp sqlEndTime = DateTimeManager.zdtLocalToTimestampSQL(calEnd);
         Timestamp sqlNow = DateTimeManager.zdtLocalToTimestampSQL(zdtSQLNow);
         
-        if(calEnd.isBefore(calStart)){
-            // TODO FIRE WARNING THAT END TIME MUST BE AFTER START TIME
-        }
+        Alert alert = new Alert(AlertType.ERROR);
+        
+        if(!calEnd.isAfter(calStart)){
+            validAppointmentEdit = false;
+            alert.setHeaderText("Appointment Start/End Error");
+            alert.setContentText("The start date and time must be BEFORE the end date and time of the appointment.");
+            alert.showAndWait();
+
+        };
         
         if(selectedCustomerId != originalCustomerId){
             // TODO: ALERT TO CREATE NEW APPOINTMENT ON CONFIRMATION
@@ -238,13 +249,12 @@ public class EditAppointmentScreenController implements Initializable {
         } 
         
         // TODO: ADD ADDITIONAL VALIDATION RULES HERE 
-        
-        validAppointmentEdit = true;
         if(validAppointmentEdit){
             try{
                 String queryBody = " appointment SET ";
                 queryBody += "userId = " + selectedUserId +", ";
                 queryBody += "customerId = " + selectedCustomerId + ", ";
+                queryBody += "type = '" + type + "', ";
                 queryBody += "title = '" + title + "', ";
                 queryBody += "description = '" + description + "', ";
                 queryBody += "location = '" + location + "', ";
@@ -271,7 +281,7 @@ public class EditAppointmentScreenController implements Initializable {
             int MASFilterId = this.getFilterId();
             MASController.setAppointmentsFilter(MASFilterType, MASFilterId);
 
-            Stage stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
             Parent scene = loader.getRoot();
             stage.setScene(new Scene(scene));
             stage.show();
@@ -362,6 +372,26 @@ public class EditAppointmentScreenController implements Initializable {
 
     public void setUserListItems(ObservableList<User> userListItems) {
         this.userListItems = userListItems;
+    }
+
+    @FXML
+    private void handleAppointmentTypeComboBox(ActionEvent event) {
+    }
+
+    public Customer getSelectedCustomerFromList() {
+        return selectedCustomerFromList;
+    }
+
+    public void setSelectedCustomerFromList(Customer selectedCustomerFromList) {
+        this.selectedCustomerFromList = selectedCustomerFromList;
+    }
+
+    public User getSelectedUserFromList() {
+        return selectedUserFromList;
+    }
+
+    public void setSelectedUserFromList(User selectedUserFromList) {
+        this.selectedUserFromList = selectedUserFromList;
     }
     
 }

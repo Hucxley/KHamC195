@@ -38,13 +38,13 @@
             <TableView fx:id="tableManageCustomers" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="464.0" prefWidth="810.0" style="-fx-background-color: #262626;" stylesheets="@css/styles.css" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
                <columns>
                   <TableColumn fx:id="colCustomerId" prefWidth="52.0" text="Id" />
-                  <TableColumn fx:id="colCustomerName" prefWidth="163.0" text="Name" />
-                  <TableColumn fx:id="colCustomerActive" prefWidth="52.0" text="Active" />
+                  <TableColumn fx:id="colCustomerName" prefWidth="152.0" text="Name" />
+                  <TableColumn fx:id="colCustomerActive" prefWidth="63.0" text="Active" />
                   <TableColumn fx:id="colCustomerStreetAddress" editable="false" minWidth="0.0" prefWidth="155.0" text="Street Address" />
                   <TableColumn fx:id="colCustomerCity" editable="false" minWidth="0.0" prefWidth="102.0" text="City" />
-                  <TableColumn fx:id="colCustomerCountry" prefWidth="104.0" text="Country" />
-                  <TableColumn fx:id="colCustomerPostalCode" prefWidth="76.0" text="Zip Code" />
-                  <TableColumn fx:id="colDateLastUpdated" prefWidth="105.0" text="Last Updated" />
+                  <TableColumn fx:id="colCustomerCountry" prefWidth="91.0" text="Country" />
+                  <TableColumn fx:id="colCustomerPostalCode" prefWidth="72.0" text="Zip Code" />
+                  <TableColumn fx:id="colDateLastUpdated" prefWidth="122.0" text="Last Updated" />
                </columns>
             </TableView>
             <GridPane GridPane.columnIndex="1" GridPane.rowIndex="3">

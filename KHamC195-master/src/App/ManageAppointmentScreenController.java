@@ -28,7 +28,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
@@ -54,7 +57,6 @@ public class ManageAppointmentScreenController implements Initializable {
     private TableColumn<Appointment, String> colCustomerName;
     @FXML
     private TableColumn<Appointment, String> colUserName;
-    @FXML
     private TableColumn<Appointment, String> colAppointmentLocation;
     @FXML
     private TableColumn<Appointment, String> colAppointmentStartTime;
@@ -78,12 +80,15 @@ public class ManageAppointmentScreenController implements Initializable {
     private Button btnDeleteAppointment;
     @FXML
     private Button btnCancelManageAppointments;
+    @FXML
+    private TableColumn<?, ?> colAppointmentType;
     
     Stage stage = ApplicationStateController.getMainStage();
     private String appointmentFilterType;
     private int appointmentFilterId;
     private int customerIdFilter;
     private ObservableList appointmentsViewAllByType;
+
 
 
     /**
@@ -229,7 +234,7 @@ public class ManageAppointmentScreenController implements Initializable {
         colAppointmentId.setCellValueFactory(new PropertyValueFactory<>("appointmentId"));
         colCustomerName.setCellValueFactory(new PropertyValueFactory<>("customerNameDisplay"));
         colUserName.setCellValueFactory(new PropertyValueFactory<>("userNameDisplay"));
-        colAppointmentLocation.setCellValueFactory(new PropertyValueFactory<>("location"));
+        colAppointmentType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colAppointmentStartTime.setCellValueFactory(new PropertyValueFactory<>("startTimeDisplay"));
         colAppointmentDuration.setCellValueFactory(new PropertyValueFactory<>("durationDisplay"));
         colDateLastUpdated.setCellValueFactory(new PropertyValueFactory<>("lastUpdateDisplay"));
@@ -318,10 +323,32 @@ public class ManageAppointmentScreenController implements Initializable {
 
     @FXML
     private void handleDeleteAppointmentButton(ActionEvent event) {
+        // TODO add logic for handling appointment deletion
+        Appointment appointmentToDelete = tableManageAppointments.getSelectionModel().getSelectedItem();
+        String appointmentStartDateTimeDisplay = appointmentToDelete.getStart().toLocalDateTime().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-mm-dd kk:mm"));
+        System.out.println(appointmentStartDateTimeDisplay);
+        Alert deleteAlert = new Alert(AlertType.CONFIRMATION);
+        deleteAlert.setHeaderText("Warning! Deleted Appointments Cannot Be Recovered");
+        deleteAlert.setContentText("Are you sure you want to delete the appointment with " + appointmentToDelete.getCustomerNameDisplay() + " for " +appointmentStartDateTimeDisplay);
+        
+        Optional<ButtonType> response = deleteAlert.showAndWait();
+         if(response.get() == ButtonType.OK){
+             // DELETE APPOINTMENT
+             
+             //
+             selectAppointmentTableDisplay();
+             
+         }
     }
 
     @FXML
-    private void handleCancelManageAppointmentsButton(ActionEvent event) {
+    private void handleCancelManageAppointmentsButton(ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("UserScreen.fxml"));
+        
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.show();
     }
 
     public String getAppointmentFilterType() {

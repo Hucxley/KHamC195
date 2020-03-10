@@ -30,6 +30,7 @@
             <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" valignment="CENTER" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" valignment="CENTER" vgrow="NEVER" />
           <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" valignment="CENTER" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" valignment="CENTER" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" valignment="CENTER" vgrow="SOMETIMES" />
             <RowConstraints vgrow="SOMETIMES" />
         </rowConstraints>
@@ -49,7 +50,12 @@
                   <Font name="Roboto Light" size="13.0" />
                </font>
             </Button>
-            <Button fx:id="btnLogoutUser" alignment="CENTER" contentDisplay="CENTER" maxHeight="26.0" maxWidth="180.0" minHeight="26.0" minWidth="180.0" mnemonicParsing="false" onAction="#handleLogoutUserButton" prefHeight="26.0" prefWidth="180.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Logout" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+            <Button fx:id="btnLogoutUser" alignment="CENTER" contentDisplay="CENTER" maxHeight="26.0" maxWidth="180.0" minHeight="26.0" minWidth="180.0" mnemonicParsing="false" onAction="#handleLogoutUserButton" prefHeight="26.0" prefWidth="180.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="Logout" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+               <font>
+                  <Font name="Roboto Light" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnViewReports" alignment="CENTER" contentDisplay="CENTER" maxHeight="26.0" maxWidth="180.0" minHeight="26.0" minWidth="180.0" mnemonicParsing="false" onAction="#handleViewReportsButton" prefHeight="26.0" prefWidth="180.0" style="-fx-background-color: #0091ea; -fx-background-radius: 0;" text="View Reports" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="4">
                <font>
                   <Font name="Roboto Light" size="13.0" />
                </font>
