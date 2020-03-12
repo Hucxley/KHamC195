@@ -6,11 +6,15 @@
 package App;
 
 import DataModels.Appointment;
+import Utilities.ActivityLog;
 import Utilities.DateTimeManager;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -81,7 +86,7 @@ public class ManageAppointmentScreenController implements Initializable {
     @FXML
     private Button btnCancelManageAppointments;
     @FXML
-    private TableColumn<?, ?> colAppointmentType;
+    private TableColumn<Appointment, String> colAppointmentType;
     
     Stage stage = ApplicationStateController.getMainStage();
     private String appointmentFilterType;
@@ -96,13 +101,13 @@ public class ManageAppointmentScreenController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+        tableManageAppointments.setPlaceholder(new Label("There are no appointments that match the filter you have selected."));
     }
 
     // CONTROLLER METHODS
     
     public void setAppointmentsFilter(String apptType, int id){
-        System.out.println(apptType);
+  
         if(apptType.matches("all")){
             this.setAppointmentFilterType(apptType);
             this.setAppointmentFilterId(-1);
@@ -115,6 +120,8 @@ public class ManageAppointmentScreenController implements Initializable {
         } else {
             System.out.println("appointment filter error!");
         }
+        
+
         
         selectAppointmentTableDisplay();
 
@@ -206,9 +213,6 @@ public class ManageAppointmentScreenController implements Initializable {
                 int apptDurationMinutes = (int)ChronoUnit.MINUTES.between(calStart.toInstant(), calEnd.toInstant());
                 String apptDurationDisplay = String.valueOf(apptDurationMinutes);
                 appointment.setDurationDisplay(apptDurationDisplay);
-                
-                System.out.println(calStart.toString());
-
                 String userName = DAO.UserDataAccess.getById(userId).getUsername();
                 appointment.setUserNameDisplay(userName);
                 String customerName = DAO.CustomerDataAccess.getById(customerId).getCustomerName();
@@ -228,8 +232,8 @@ public class ManageAppointmentScreenController implements Initializable {
     }
     
     public void populateAppointmentList(ObservableList<Appointment> appointmentList){
-        tableManageAppointments.getItems().clear();
-        tableManageAppointments.getItems().addAll(appointmentList);
+
+        tableManageAppointments.setItems(appointmentList);
         
         colAppointmentId.setCellValueFactory(new PropertyValueFactory<>("appointmentId"));
         colCustomerName.setCellValueFactory(new PropertyValueFactory<>("customerNameDisplay"));
@@ -245,41 +249,41 @@ public class ManageAppointmentScreenController implements Initializable {
     @FXML
     private void handleBtnAppointmentViewAll(ActionEvent event) {
         ObservableList appointmentsViewByType = this.getAppointmentsViewAllByType();
-        populateAppointmentList(appointmentsViewByType);
+        ZonedDateTime now = ZonedDateTime.now();
+        FilteredList<Appointment> allAppointments = new FilteredList<>(this.getAppointmentsViewAllByType());
+        tableManageAppointments.setItems(allAppointments);
     }
 
     @FXML
     private void handleBtnAppointmentViewWeek(ActionEvent event) {
-        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault());
         ObservableList<Appointment> appointments = this.getAppointmentsViewAllByType();
-        ObservableList<Appointment> appointmentsForWeek = FXCollections.observableArrayList();
-        appointments.forEach(appointment -> {
+        FilteredList<Appointment> appointmentsForWeek = new FilteredList<>(appointments);
+        
+        // LAMBDA TO FILTER DATES WITHIN NEXT 7 DAYS
+        appointmentsForWeek.setPredicate(appointment -> {
             ZonedDateTime start = appointment.getStart();
-            int daysUntilAppointment = (int) ChronoUnit.DAYS.between(now.toInstant(),start.toInstant());
-            System.out.println(daysUntilAppointment);
-            if(daysUntilAppointment >= 0 && daysUntilAppointment <= 7){
-                appointmentsForWeek.add(appointment);
-            }
+            int diffBetween = (int) Duration.between(now, appointment.getStart()).toDays();
+            return start.isAfter(now) && diffBetween >=0 && diffBetween < 7;
         });
         
-        populateAppointmentList(appointmentsForWeek);
+        tableManageAppointments.setItems(appointmentsForWeek);
     }
 
     @FXML
     private void handleBtnAppointmentViewMonth(ActionEvent event) {
-        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault());
         ObservableList<Appointment> appointments = this.getAppointmentsViewAllByType();
-        ObservableList<Appointment> appointmentsForWeek = FXCollections.observableArrayList();
-        appointments.forEach(appointment -> {
+        FilteredList<Appointment> appointmentsForMonth = new FilteredList<>(appointments);
+        
+        // LAMBDA TO FILTER DATES WITHIN 30 DAYS DURATION
+        appointmentsForMonth.setPredicate((Appointment appointment) -> {
             ZonedDateTime start = appointment.getStart();
-            int daysUntilAppointment = (int) ChronoUnit.DAYS.between(now.toInstant(),start.toInstant());
-            System.out.println(daysUntilAppointment);
-            if(daysUntilAppointment >= 0 && daysUntilAppointment <= 30){
-                appointmentsForWeek.add(appointment);
-            }
+            int diffBetween = (int) Duration.between(now, appointment.getStart()).toDays();
+            return start.isAfter(now) && diffBetween >=0 && diffBetween < 30;
         });
         
-        populateAppointmentList(appointmentsForWeek);
+        tableManageAppointments.setItems(appointmentsForMonth);
     }
 
     @FXML
@@ -313,7 +317,11 @@ public class ManageAppointmentScreenController implements Initializable {
                 stage.setScene(new Scene(scene));
                 stage.show();
             } else {
-                // TODO SHOW ALERT THAT APPOINTMENT MUST BE SELECTED TO EDIT
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Selection Error!");
+                alert.setHeaderText("You must have an appointment selected before you can edit");
+                alert.setContentText("Please click on an appointment in the list to select it, then click the Edit Appointment button again.");
+                alert.showAndWait();
             }
 
         }catch(IOException ex){
@@ -325,20 +333,30 @@ public class ManageAppointmentScreenController implements Initializable {
     private void handleDeleteAppointmentButton(ActionEvent event) {
         // TODO add logic for handling appointment deletion
         Appointment appointmentToDelete = tableManageAppointments.getSelectionModel().getSelectedItem();
-        String appointmentStartDateTimeDisplay = appointmentToDelete.getStart().toLocalDateTime().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-mm-dd kk:mm"));
-        System.out.println(appointmentStartDateTimeDisplay);
         Alert deleteAlert = new Alert(AlertType.CONFIRMATION);
         deleteAlert.setHeaderText("Warning! Deleted Appointments Cannot Be Recovered");
-        deleteAlert.setContentText("Are you sure you want to delete the appointment with " + appointmentToDelete.getCustomerNameDisplay() + " for " +appointmentStartDateTimeDisplay);
+        deleteAlert.setContentText("Are you sure you want to delete the appointment with " + appointmentToDelete.getCustomerNameDisplay() + " scheduled for " + appointmentToDelete.getStartTimeDisplay() +"?");
         
         Optional<ButtonType> response = deleteAlert.showAndWait();
-         if(response.get() == ButtonType.OK){
-             // DELETE APPOINTMENT
-             
-             //
-             selectAppointmentTableDisplay();
-             
-         }
+        if(response.get() == ButtonType.OK){
+            try{
+               int appointmentId = appointmentToDelete.getAppointmentId();
+               String queryBody = " from appointment where appointmentId = " + appointmentId;
+               DAO.QueryManager.makeRequest("delete", queryBody);
+            } catch(Exception ex){
+                System.out.println(ex);
+            }
+        }   
+         
+        try (PrintWriter auditLog = ActivityLog.getAuditLog()) {
+            Timestamp sqlNow = DateTimeManager.zdtLocalToTimestampSQL(ZonedDateTime.now());
+            String zdtLocalDeletedStartTime = appointmentToDelete.getStart().withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm"));
+            auditLog.append(sqlNow + "[UTC]: Appointment record for (" + appointmentToDelete.getUserNameDisplay() + " and " + appointmentToDelete.getCustomerNameDisplay() + ") scheduled for " + zdtLocalDeletedStartTime +" deleted by: " + ApplicationStateController.getActiveUser() + ".\n");
+        } catch (Exception ex){
+                System.out.println(ex);
+        }
+         
+         setAppointmentsFilter(this.getAppointmentFilterType(), this.getAppointmentFilterId());
     }
 
     @FXML

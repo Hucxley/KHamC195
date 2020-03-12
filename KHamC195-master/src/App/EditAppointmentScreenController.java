@@ -8,20 +8,20 @@ package App;
 import DataModels.Appointment;
 import DataModels.Customer;
 import DataModels.User;
+import Utilities.ActivityLog;
 import Utilities.DateTimeManager;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,11 +38,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
 
 /**
  * FXML Controller class
@@ -118,15 +114,13 @@ public class EditAppointmentScreenController implements Initializable {
         LocalDate appointmentEndDate = LocalDate.parse(DateTimeManager.toDateString(appointment.getEnd()));
         LocalTime appointmentEndTime = LocalTime.parse(DateTimeManager.toTimeString(appointment.getEnd()));
         ObservableList<User> usersList = DAO.UserDataAccess.getUsersList();
-        System.out.println(usersList.size());
         ObservableList<Customer> customersList = DAO.CustomerDataAccess.getCustomers();
-        System.out.println(usersList.size());
         ObservableList<String> appointmentTypes = ApplicationStateController.getAllowedAppointmentTypes();
         int appointmentUserId = appointment.getUserId();
         int appointmentCustomerId = appointment.getCustomerId();
         
         
-        txtAppointmentTitle.setText(appointment.getType());
+        txtAppointmentTitle.setText(appointment.getTitle());
         txtAppointmentDescription.setText(appointment.getDescription());
         txtAppointmentLocation.setText(appointment.getLocation());
         txtAppointmentContact.setText(appointment.getContact());
@@ -138,9 +132,7 @@ public class EditAppointmentScreenController implements Initializable {
         comboBoxAppointmentType.getItems().addAll(appointmentTypes);
         
         // Get index of appointment time in comboBox item list to set selected times on view load
-        System.out.println(appointmentStartTime.toString());
         int appointmentStartTimeIndex = comboBoxStartTime.getItems().indexOf(appointmentStartTime.toString());
-        System.out.println(comboBoxStartTime.getItems());
         int appointmentEndTimeIndex = comboBoxEndTime.getItems().indexOf(appointmentEndTime.toString());
         
         // Lambda to compare ids in userList to match the userId for the appointment to set selected on view load
@@ -237,16 +229,45 @@ public class EditAppointmentScreenController implements Initializable {
             alert.showAndWait();
 
         };
-        
-        if(selectedCustomerId != originalCustomerId){
-            // TODO: ALERT TO CREATE NEW APPOINTMENT ON CONFIRMATION
+        // QUERY and HANDLE appointments for user or customer that overlap with the selected start and end times
+        // SET validAppointmentEdit = false to block appointment creation and prompt user to change start/end time to avoid conflict
+        try{
+            System.out.println(editedAppointment.getAppointmentId());
+            String appointmentOverlapQuery = " * from appointment where ('" +sqlStartTime + "' between start and end) OR ('";
+            appointmentOverlapQuery += sqlEndTime +"' between start and end) OR ";
+            appointmentOverlapQuery += "(start between '" + sqlStartTime + "' and '" + sqlEndTime + "') OR ";
+            appointmentOverlapQuery += "(end between '" + sqlStartTime + "' and '" + sqlEndTime + "') AND ";
+            appointmentOverlapQuery += "(userId != " +selectedUserId + " OR customerId != " + selectedCustomerId +") AND ";
+            appointmentOverlapQuery += "appointmentId <> " + editedAppointment.getAppointmentId();
+            System.out.println(appointmentOverlapQuery);
+            DAO.QueryManager.makeRequest("select", appointmentOverlapQuery);
+            ResultSet response = DAO.QueryManager.getResults();
+            if(response.next()){
+                if(response.getInt("appointmentId") != editedAppointment.getAppointmentId()){
+                    validAppointmentEdit = false;
+                    // An overlapping appointment is found for user or customer show alert
+                    int conflictUserId = response.getInt("userId");
+                    int conflictCustomerId = response.getInt("customerId");
+                    // determine if conflict is with user or customer and change message to guide correction
+                    if(conflictUserId == selectedUser.getUserId()){
+                        alert.setTitle(selectedUser.getUsername() + " Has a Conflict!");
+                    }else if(conflictCustomerId == selectedCustomer.getCustomerId()){
+                        alert.setTitle(selectedCustomer.getCustomerName() + " Has a Conflict!");
+                    }else{
+                        alert.setTitle("There may be a schedule conflict");
+                    }
+
+                    String conflictingStartTime = DateTimeManager.convertToZDT(response.getTimestamp("start")).withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("hh:mm a"));
+                    String conflictingEndTime = DateTimeManager.convertToZDT(response.getTimestamp("end")).withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("hh:mm a"));
+                    alert.setHeaderText("There is an appointment that conflicts with the selected time");
+                    alert.setContentText("The conflicting appointment begins at " + conflictingStartTime + " and ends at " +conflictingEndTime +". Please change your selection to avoid overlapping with this appointment.");
+                    alert.showAndWait();
+
+                }
+            }
+        } catch(SQLException ex){
+            System.out.println(ex);
         }
-        
-        if(selectedUserId != originalUserId){
-            // TODO: ALERT TO CONFIRM CHANGE OF USER FOR THE APPOINTMENT
-            
-            
-        } 
         
         // TODO: ADD ADDITIONAL VALIDATION RULES HERE 
         if(validAppointmentEdit){
@@ -267,10 +288,19 @@ public class EditAppointmentScreenController implements Initializable {
                 queryBody += "where appointmentId = " + editedAppointment.getAppointmentId(); 
                 
                 DAO.QueryManager.makeRequest("update", queryBody);
+                
+                
             
             } catch(SQLException ex){
                 System.out.println(ex);
             }
+            
+            try (PrintWriter auditLog = ActivityLog.getAuditLog()) {
+                auditLog.append(sqlNow + "[UTC]: Appointment record for (" + selectedUser.getUsername() + " and " + selectedCustomer.getCustomerName() + ") on " +calStart.withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-mm-dd kk:mm")) + " edited by: " + ApplicationStateController.getActiveUser() + ".\n");
+            } catch (Exception ex){
+                System.out.println(ex);
+            }
+            
             
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("ManageAppointmentScreen.fxml"));

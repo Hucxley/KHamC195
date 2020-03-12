@@ -8,8 +8,10 @@ package App;
 import DAO.QueryManager;
 import DataModels.Customer;
 import DataModels.User;
+import Utilities.ActivityLog;
 import Utilities.DateTimeManager;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -112,17 +114,28 @@ public class EditCustomerScreenController implements Initializable {
         String currentUserName = currentUser.getUsername();
         int customerID = selectedCustomer.getCustomerId();
         boolean boolIsActive = checkBoxCustomerActive.isSelected();
-        String name = txtCustomerName.getText();
+        String name = txtCustomerName.getText().trim();
         String phone = txtCustomerPhone.getText();
-        String address1 = txtAddress1.getText();
+        String address1 = txtAddress1.getText().trim();
         String address2 = txtAddress2.getText() + " ";
-        String city = txtCity.getText();
-        String country = txtCountryName.getText();
+        String city = txtCity.getText().trim();
+        String country = txtCountryName.getText().trim();
         String postalCode = txtPostalCode.getText();
- 
-        int cityId = DAO.QueryManager.dataTableHasValueInFieldName("city", "city", city);
-        int countryId = DAO.QueryManager.dataTableHasValueInFieldName("country", "country", country);
-        int addressId = DAO.QueryManager.getExistingAddress(address1, postalCode);
+        boolean isValidCustomer = true;
+        int cityId = -1;
+        int countryId = -1;
+        int addressId = -1;
+        
+        if(name.length() == 0 || address1.length() == 0 || city.length() == 0 || country.length() == 0){
+            isValidCustomer = false;
+        }
+        
+        if(isValidCustomer){
+            
+        }
+        cityId = DAO.QueryManager.dataTableHasValueInFieldName("city", "city", city);
+        countryId = DAO.QueryManager.dataTableHasValueInFieldName("country", "country", country);
+        addressId = DAO.QueryManager.getExistingAddress(address1, postalCode);
         
         if(!boolIsActive){
             Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -134,6 +147,12 @@ public class EditCustomerScreenController implements Initializable {
             if(response.get() == ButtonType.OK){
                 setCustomerInactive(this.getSelectedCustomer());
                 deleteCustomerAppointments(this.getSelectedCustomer());
+                
+                try (PrintWriter auditLog = ActivityLog.getAuditLog()) {
+                    auditLog.append(sqlNow + "[UTC]: Customer record (" + name + ") set inactive and all appointments deleted by: " + ApplicationStateController.getActiveUser() + ".\n");
+                } catch (Exception ex){
+                    System.out.println(ex);
+                }
 
             } else {
                 checkBoxCustomerActive.setSelected(true);
@@ -160,7 +179,7 @@ public class EditCustomerScreenController implements Initializable {
                 }
             }
 
-        if(cityId == -1){
+        if(cityId == -1 && isValidCustomer){
             try
             {
                 String cityInsertQuery = " into city (city, countryId, createDate, createdBy, lastUpdate, lastUpdateBy) values ('";
@@ -180,7 +199,7 @@ public class EditCustomerScreenController implements Initializable {
             }
         }
         
-        if(addressId == -1){
+        if(addressId == -1 && isValidCustomer){
             try
             {
                 String addressInsertQuery = " into address (address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdate, lastUpdateBy) values ('";
@@ -202,38 +221,57 @@ public class EditCustomerScreenController implements Initializable {
                 System.out.println(ex);
             }
         } else {
-            try 
+            if(isValidCustomer){
+                try 
+                {
+                    String addressUpdateQuery = " address SET ";
+                    addressUpdateQuery += "address = '" + address1 + "', address2 = '" +address2 + "', ";
+                    addressUpdateQuery += "cityId = " + cityId + ", postalCode = '" + postalCode +"', ";
+                    addressUpdateQuery += "phone = '" + phone + "', ";
+                    addressUpdateQuery += "lastUpdate = '" + sqlNow + "', " ;
+                    addressUpdateQuery += "lastUpdateBy = '" + currentUserName + "' WHERE addressId = " +addressId ;
+                    DAO.QueryManager.makeRequest("update", addressUpdateQuery);
+
+                } catch(SQLException ex){
+                    System.out.println(ex);
+                }
+            }
+        }
+        
+        if(!isValidCustomer){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Customer Entry Error");
+            alert.setHeaderText("Incomplete Customer Information Entered");
+            alert.setContentText("To create a new customer record, you must at least enter their name, street address, city, and country. Please correct your entry and resubmit.");
+            alert.showAndWait();
+        }else{
+            isActive = 1;
+            try
             {
-                String addressUpdateQuery = " address SET ";
-                addressUpdateQuery += "address = '" + address1 + "', address2 = '" +address2 + "', ";
-                addressUpdateQuery += "cityId = " + cityId + ", postalCode = '" + postalCode +"', ";
-                addressUpdateQuery += "phone = '" + phone + "', ";
-                addressUpdateQuery += "lastUpdate = '" + sqlNow + "', " ;
-                addressUpdateQuery += "lastUpdateBy = '" + currentUserName + "' WHERE addressId = " +addressId ;
-                DAO.QueryManager.makeRequest("update", addressUpdateQuery);
-                
+                String queryBody = " customer SET ";
+                queryBody += "customerName = '" + name + "', " ;
+                queryBody += "addressId = " + addressId + ", " ;
+                queryBody += "active = " + isActive + ", " ;
+                queryBody += "lastUpdate = '" + sqlNow + "', " ;
+                queryBody += "lastUpdateBy = '" + currentUserName + "' WHERE customerId = " + customerID;     
+                DAO.QueryManager.makeRequest("update", queryBody);
+
+                try (PrintWriter auditLog = ActivityLog.getAuditLog()) {
+                    auditLog.append(sqlNow + "[UTC]: Customer record (" + name + ") edited by: " + ApplicationStateController.getActiveUser() + ".\n");
+                } catch (Exception ex){
+                    System.out.println(ex);
+                }
+
             } catch(SQLException ex){
                 System.out.println(ex);
             }
+
         }
             
-        isActive = 1;
-        try
-        {
-            String queryBody = " customer SET ";
-            queryBody += "customerName = '" + name + "', " ;
-            queryBody += "addressId = " + addressId + ", " ;
-            queryBody += "active = " + isActive + ", " ;
-            queryBody += "lastUpdate = '" + sqlNow + "', " ;
-            queryBody += "lastUpdateBy = '" + currentUserName + "' WHERE customerId = " + customerID;     
-            DAO.QueryManager.makeRequest("update", queryBody);
-
-        } catch(SQLException ex){
-            System.out.println(ex);
-        }
-
+        
         }
         
+
         Parent root = FXMLLoader.load(getClass().getResource("ManageCustomersScreen.fxml"));
         
         Scene scene = new Scene(root);

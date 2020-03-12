@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 
 
 /**
@@ -36,7 +37,7 @@ public class ApplicationStateController extends Application {
     private static ObservableList<String> allowedAppointmentTypes = FXCollections.observableArrayList();
     
     
-    
+    // SETS Allowable Appointment Start/End Times within limits of business hours
     private static void populateAppointmentTimes(){
         // startHour is the hour appointments can start
         int startHour = 8;
@@ -65,6 +66,13 @@ public class ApplicationStateController extends Application {
             allowedAppointmentTimes.add(displayHour);
             displayHour = prefix + currentHour + ":45";
             allowedAppointmentTimes.add(displayHour);
+            
+            // Add final closing business hour to allowed list for ending appointments at end of business.
+            if(i == totalAppointmentHours){
+                currentHour++;
+                displayHour = currentHour + ":00";
+                allowedAppointmentTimes.add(displayHour);
+            }
             
         }
     }
@@ -144,6 +152,5 @@ public class ApplicationStateController extends Application {
     private void populateAppointmentTypes() {
         allowedAppointmentTypes.addAll("Presentation","Scrum", "Consultation", "Feedback", "Progress Update", "Follow Up", "Marketing", "Sales");
     }
-
     
 }

@@ -194,4 +194,85 @@
     -fx-fill: #FFFFFF;
 }
 
+.scroll-pane {
+    -fx-background-fills: #212121;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar:horizontal,
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar .increment-button,
+.scroll-pane .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FFFFFF;
+}
+
+.scroll-pane .scroll-bar:horizontal .track,
+.scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar:horizontal .thumb,
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #0091ea;
+    -fx-background-radius: 0em;
+    -fx-background-insets: 0, 0, 0;
+}
+
+.scroll-pane > .corner {
+    -fx-background-color: #212121 !important;
+}
+
+.text-area {
+    -text-area-background: #212121;
+    -fx-text-fill: white !important;
+    -fx-border-color: transparent transparent transparent transparent;
+    -fx-background-color: transparent;
+    -fx-focus-color: transparent; 
+    -fx-text-box-border: transparent;
+    -fx-background-insets: 0;
+}
+
+.text-area .content {
+    -fx-background-color: -text-area-background;
+}
+
+.text-area .content .text {
+    -fx-fill: #FFFFFF;
+}
+
+/* List Cell customization CSS Guide */
+/* From user GOXR3PLUS from https://stackoverflow.com/a/39620871 */
+
+#schedule-list {
+    -fx-background-color: #212121;
+}
+
+#schedule-list .list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-background-color: #0091ea;
+    -fx-text-fill: white;
+}
+
+#schedule-list .list-cell{
+    -fx-font-size: 13;
+}
+
+#schedule-list .list-cell:even { 
+    -fx-background-color: #212121;
+    -fx-text-fill: white;
+}
+
+#schedule-list .list-cell:odd {
+    -fx-background-color: #272727;
+    -fx-text-fill: white;
+}
+
+#schedule-list .list-cell:filled:hover {
+    -fx-background-color: #0091ea;
+    -fx-text-fill: white;
+}
+
 

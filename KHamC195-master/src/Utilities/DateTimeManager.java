@@ -7,8 +7,6 @@ package Utilities;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,7 +14,6 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 
 /**
  *
@@ -46,7 +43,6 @@ public class DateTimeManager {
         
         //Create Timestamp values from Instants to update database
         Timestamp timestampSQL = Timestamp.valueOf(localDateTime); //this value can be inserted into database
-        System.out.println("Timestamp to be inserted: " + timestampSQL); 
         
         return timestampSQL;
     }

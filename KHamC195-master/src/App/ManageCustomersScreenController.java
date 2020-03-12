@@ -10,11 +10,14 @@ import DataModels.Address;
 import DataModels.City;
 import DataModels.Country;
 import DataModels.Customer;
+import Utilities.ActivityLog;
 import Utilities.DateTimeManager;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
@@ -188,7 +191,12 @@ public class ManageCustomersScreenController implements Initializable {
         if(response.get() == ButtonType.OK){
             setCustomerInactive(selectedCustomer);
             deleteCustomerAppointments(selectedCustomer);
-            
+            try (PrintWriter auditLog = ActivityLog.getAuditLog()) {
+                Timestamp sqlNow = DateTimeManager.zdtLocalToTimestampSQL(ZonedDateTime.now());
+                auditLog.append(sqlNow + "[UTC]: Customer record and appointments for " + selectedCustomer.getCustomerName() + " deleted by: " + ApplicationStateController.getActiveUser() + ".\n");
+            } catch (Exception ex){
+                    System.out.println(ex);
+            }
         }else{
             confirmAlert.hide();
         }
@@ -223,13 +231,10 @@ public class ManageCustomersScreenController implements Initializable {
         }
         
         try {
-           getAllCustomerData();
+            getAllCustomerData();
         } catch (SQLException | ParseException ex) {
-           Logger.getLogger(ManageUsersScreenController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ManageUsersScreenController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-
         
     }
 

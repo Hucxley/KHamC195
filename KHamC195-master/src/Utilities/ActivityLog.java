@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -30,6 +32,20 @@ public class ActivityLog {
         }
        
         
+    }
+    
+    public static PrintWriter getAuditLog() throws FileNotFoundException{
+        PrintWriter pw = null;
+        try{
+            pw = new PrintWriter(new FileOutputStream(
+            new File("AuditLog.txt"),
+            true /* append = true */));
+        } catch(FileNotFoundException ex){
+            System.out.println(ex);
+        }
+        
+        return pw;
+
     }
 
     

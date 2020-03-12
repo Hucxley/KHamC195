@@ -32,7 +32,7 @@ public class DBConnection {
             }
             
         } catch (ClassNotFoundException ex){
-            System.out.println("driver class not found!");
+            System.out.println("driver class not found: " + ex);
         } catch (SQLException ex) {
             System.out.println("sql exception: " + ex);
         }

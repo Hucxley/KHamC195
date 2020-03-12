@@ -11,10 +11,13 @@ import DataModels.User;
 import Utilities.DateTimeManager;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -96,12 +99,13 @@ public class NewAppointmentScreenController implements Initializable {
         
         // Lambda to populate user & customer drop down boxes and selection lists
         usersList.forEach(user -> {
-            System.out.println(user);
+
             this.getUserListItems().add(user);
             comboBoxUserName.getItems().add(user);
         });
         
         // Lambda to compare ids in custmerList to match the customerId for the appointment to set selected on view load
+        // Limits available customer selection to active customers only 
         customersList.forEach(customer -> {
             if(customer.getActive()){
                 this.getCustomerListItems().add(customer);
@@ -158,12 +162,47 @@ public class NewAppointmentScreenController implements Initializable {
             alert.setHeaderText("Appointment Start/End Error");
             alert.setContentText("The start date and time must be BEFORE the end date and time of the appointment.");
             alert.showAndWait();
-            // TODO FIRE WARNING THAT END TIME MUST BE AFTER START TIME
         }
+        
+        // QUERY and HANDLE appointments for user or customer that overlap with the selected start and end times
+        // SET validAppointment = false to block appointment creation and prompt user to change start/end time to avoid conflict
+        try{
+            String appointmentOverlapQuery = " * from appointment where ('" +sqlStartTime + "' between start and end) OR ('";
+            appointmentOverlapQuery += sqlEndTime +"' between start and end) OR ";
+            appointmentOverlapQuery += "(start between '" + sqlStartTime + "' and '" + sqlEndTime + "') OR ";
+            appointmentOverlapQuery += "(end between '" + sqlStartTime + "' and '" + sqlEndTime + "') AND ";
+            appointmentOverlapQuery += "(userId = " +selectedUserId +" OR customerId = " + selectedCustomerId + ")";
+
+            DAO.QueryManager.makeRequest("select", appointmentOverlapQuery);
+            ResultSet response = DAO.QueryManager.getResults();
+            if(response.next()){
+                validAppointment = false;
+                // An overlapping appointment is found for user or customer show alert
+                int conflictUserId = response.getInt("userId");
+                int conflictCustomerId = response.getInt("customerId");
+                // determine if conflict is with user or customer and change message to guide correction
+                if(conflictUserId == selectedUser.getUserId()){
+                    alert.setTitle(selectedUser.getUsername() + " Has a Conflict!");
+                }else if(conflictCustomerId == selectedCustomer.getCustomerId()){
+                    alert.setTitle(selectedCustomer.getCustomerName() + " Has a Conflict!");
+                }else{
+                    alert.setTitle("There may be a schedule conflict");
+                }
+                
+                String conflictingStartTime = DateTimeManager.convertToZDT(response.getTimestamp("start")).withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("hh:mm a"));
+                String conflictingEndTime = DateTimeManager.convertToZDT(response.getTimestamp("end")).withZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("hh:mm a"));
+                alert.setHeaderText("There is an appointment that conflicts with the selected time");
+                alert.setContentText("The conflicting appointment begins at " + conflictingStartTime + " and ends at " +conflictingEndTime +". Please change your selection to avoid overlapping with this appointment.");
+                alert.showAndWait();
+            }
+        } catch(SQLException ex){
+            System.out.println(ex);
+        }
+
         
         // TODO: ADD ADDITIONAL VALIDATION RULES HERE 
         
- 
+        
         if(validAppointment){
             try{
                 String queryBody = " into appointment (userId, customerId, type, title, description, location, contact, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy) values (";

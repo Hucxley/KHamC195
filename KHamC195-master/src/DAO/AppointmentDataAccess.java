@@ -121,10 +121,10 @@ public static ArrayList<Appointment> getAppointmentsByCustomerId(int id){
         
     }
     
-    public static Appointment getByAppoinhtmentId(int id){
+    public static Appointment getByAppointmentId(int id){
         Appointment foundAppointment = null;
         try{
-            QueryManager.makeRequest("select", " * from appointment where userId = " + id);
+            QueryManager.makeRequest("select", " * from appointment where appointmentId = " + id);
             ResultSet response = QueryManager.getResults();
             while(response.next()){
                 int appointmentId = response.getInt("appointmentId");

@@ -6,9 +6,12 @@
 package App;
 
 import DataModels.User;
+import Utilities.ActivityLog;
 import Utilities.DateTimeManager;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
@@ -97,13 +100,13 @@ public class NewUserScreenController implements Initializable {
     
     private void createNewUserRecord() throws ParseException, IOException{
         Boolean successfulInsert = false;
+        Timestamp sqlNow = DateTimeManager.zdtLocalToTimestampSQL(ZonedDateTime.now());
         try {
             User existingUser = DAO.UserDataAccess.getByUsername(this.username);
             if(existingUser != null){
                 txtNewUserError.setText("That Username is not available. Please try a different username");
                 txtNewUserError.setVisible(true);
             }else{
-                java.sql.Date sqlNow = new java.sql.Date(new Date().getTime());
                 String currentUser = ApplicationStateController.getActiveUser().getUsername();
                 int isActive = 1;
                 String queryBody = " into user (username, password, active, createDate, createdBy, lastUpdate, lastUpdateBy) values (";
@@ -128,6 +131,11 @@ public class NewUserScreenController implements Initializable {
         }
         
         if(successfulInsert){
+            try (PrintWriter auditLog = ActivityLog.getAuditLog()) {
+                auditLog.append(sqlNow + "[UTC]: New User record created for " + this.username + " by: " + ApplicationStateController.getActiveUser() + ".\n");
+            } catch (Exception ex){
+                System.out.println(ex);
+            }
             Parent root = FXMLLoader.load(getClass().getResource("ManageUsersScreen.fxml"));
         
             Scene scene = new Scene(root);

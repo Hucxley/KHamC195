@@ -143,9 +143,9 @@ public class UserScreenController implements Initializable {
 
     @FXML
     private void handleViewReportsButton(ActionEvent event) throws IOException {
-        // TODO MAKE SELECT REPORTS VIEW AND HANDLE IT HERE
+       
         Stage stage = ApplicationStateController.getMainStage();
-        Parent root = FXMLLoader.load(getClass().getResource("ManageUsersScreen.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("ReportSelectionScreen.fxml"));
         
         Scene scene = new Scene(root);
 

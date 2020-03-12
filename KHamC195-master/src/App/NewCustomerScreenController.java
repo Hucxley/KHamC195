@@ -19,6 +19,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -69,22 +71,31 @@ public class NewCustomerScreenController implements Initializable {
 
     @FXML
     private void handleAddNewCustomerButton(ActionEvent event) throws IOException {
-        String name = txtCustomerName.getText();
+        String name = txtCustomerName.getText().trim();
         String phone = txtCustomerPhone.getText();
-        String address1 = txtAddress1.getText();
+        String address1 = txtAddress1.getText().trim();
         String address2 = txtAddress2.getText();
-        String city = txtCity.getText();
+        String city = txtCity.getText().trim();
         String postalCode = txtPostalCode.getText();
-        String country = txtCountryName.getText();
+        String country = txtCountryName.getText().trim();
         int active = 1;
         Timestamp sqlNow = DateTimeManager.zdtLocalToTimestampSQL(ZonedDateTime.now());
         String currentUserName = ApplicationStateController.getActiveUser().getUsername();
+        int cityId = -1;
+        int countryId = -1;
+        int addressId = -1;
+        boolean isValidCustomer = true;
+        if(address1.length() == 0 || name.length() == 0 || city.length() == 0 || country.length() == 0){
+            isValidCustomer = false;
+        }
         
-        int cityId = DAO.QueryManager.dataTableHasValueInFieldName("city", "city", city);
-        int countryId = DAO.QueryManager.dataTableHasValueInFieldName("country", "country", country);
-        int addressId = DAO.QueryManager.getExistingAddress(address1, postalCode);
+        if(isValidCustomer){
+            cityId = DAO.QueryManager.dataTableHasValueInFieldName("city", "city", city);
+            countryId = DAO.QueryManager.dataTableHasValueInFieldName("country", "country", country);
+            addressId = DAO.QueryManager.getExistingAddress(address1, postalCode);
+        }
           
-        if(countryId == -1){
+        if(countryId == -1 && isValidCustomer){
             try
             {
                 String countryInsertQuery = " into country (country, createDate, createdBy, lastUpdate, lastUpdateBy) values ('";
@@ -104,7 +115,7 @@ public class NewCustomerScreenController implements Initializable {
             }
         }
 
-        if(cityId == -1){
+        if(cityId == -1 && isValidCustomer){
             try
             {
                 String cityInsertQuery = " into city (city, countryId, createDate, createdBy, lastUpdate, lastUpdateBy) values ('";
@@ -124,7 +135,7 @@ public class NewCustomerScreenController implements Initializable {
             }
         }
         
-        if(addressId == -1){
+        if(addressId == -1 && isValidCustomer){
              try
             {
                 String addressInsertQuery = " into address (address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdate, lastUpdateBy) values ('";
@@ -132,7 +143,6 @@ public class NewCustomerScreenController implements Initializable {
                 addressInsertQuery += address2 + "', " + cityId + ", '" + postalCode + "', '" + phone +"', '";
                 addressInsertQuery += sqlNow + "', '" + currentUserName + "', '" + sqlNow + "', '" + currentUserName +"')";   
                 String addressSelectQuery = " * from address where address = '" + address1 + "'";
-                System.out.println(addressInsertQuery);
                 DAO.QueryManager.makeRequest("insert", addressInsertQuery);
                 DAO.QueryManager.makeRequest("select", addressSelectQuery);
                 ResultSet results = DAO.QueryManager.getResults();
@@ -141,44 +151,46 @@ public class NewCustomerScreenController implements Initializable {
                         addressId = results.getInt("addressId");
                     }
                 }
-                System.out.println(addressId);
-
             } catch(SQLException ex){
                 System.out.println(ex);
             }
         
         }
         
-        if(countryId > 0 && cityId > 0 && addressId > 0){
-            try {
-                String customerInsertQuery = " into customer(customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy) values (";
-                customerInsertQuery += "'" + name + "', ";
-                customerInsertQuery += "" + addressId + ", ";
-                customerInsertQuery += "'" + active + "', ";
-                customerInsertQuery += "'" + sqlNow + "', ";
-                customerInsertQuery += "'" + currentUserName + "', ";
-                customerInsertQuery += "'" + sqlNow + "', ";
-                customerInsertQuery += "'" + currentUserName + "')";
-
-                System.out.println(customerInsertQuery);
-                DAO.QueryManager.makeRequest("insert", customerInsertQuery);
-            } catch(SQLException ex){
-                System.out.println(ex);
+        if(!isValidCustomer){
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Customer Entry Error");
+            alert.setHeaderText("Incomplete Customer Information Entered");
+            alert.setContentText("To create a new customer record, you must at least enter their name, street address, city, and country. Please correct your entry and resubmit.");
+            alert.showAndWait();
+        }else{
+            if(countryId > 0 && cityId > 0 && addressId > 0){
+                try {
+                    String customerInsertQuery = " into customer(customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy) values (";
+                    customerInsertQuery += "'" + name + "', ";
+                    customerInsertQuery += "" + addressId + ", ";
+                    customerInsertQuery += "'" + active + "', ";
+                    customerInsertQuery += "'" + sqlNow + "', ";
+                    customerInsertQuery += "'" + currentUserName + "', ";
+                    customerInsertQuery += "'" + sqlNow + "', ";
+                    customerInsertQuery += "'" + currentUserName + "')";
+                    DAO.QueryManager.makeRequest("insert", customerInsertQuery);
+                } catch(SQLException ex){
+                    System.out.println(ex);
+                }
             }
-        }
-        
-        
-        stage = ApplicationStateController.getMainStage();
-        Parent root = FXMLLoader.load(getClass().getResource("ManageCustomersScreen.fxml"));
-        
-        Scene scene = new Scene(root);
 
-        stage.setScene(scene);
-        stage.centerOnScreen();
-        stage.show();
-        
-        
-        
+
+            stage = ApplicationStateController.getMainStage();
+            Parent root = FXMLLoader.load(getClass().getResource("ManageCustomersScreen.fxml"));
+
+            Scene scene = new Scene(root);
+
+            stage.setScene(scene);
+            stage.centerOnScreen();
+            stage.show();
+        }
+
     }
 
     @FXML

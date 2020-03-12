@@ -72,8 +72,7 @@ public class LoginScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        System.out.println(rb.getLocale());
-        System.out.println(Locale.getDefault());
+
         languages = rb;
         btnLoginSubmit.setText(languages.getString("SUBMIT"));
         txtUsername.setPromptText(languages.getString("USERNAME_PROMPT"));
@@ -99,11 +98,8 @@ public class LoginScreenController implements Initializable {
                 if(authenticatedUser){
                     ArrayList<Appointment> appointments = (ArrayList) AppointmentDataAccess.getAppointmentsByUserId(currentUser.getUserId());
                     appointments.forEach(appointment -> {
-                        System.out.println(currentTime);
                         ZonedDateTime startTime = appointment.getStart();
-                        System.out.println("appointment start time: " + startTime );
                         int diffBetween = (int) currentTime.until(startTime, ChronoUnit.MINUTES);
-                        System.out.println("time until next appointments: " + diffBetween);
                         if(diffBetween >= 0 && diffBetween <= 15){
                             this.setAllNotificationsViewed(false);
                             Alert confirmAlert = new Alert(Alert.AlertType.WARNING);
